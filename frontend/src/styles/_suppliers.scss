@@ -1,0 +1,97 @@
+@use "variables" as vars;
+
+.suppliers-page {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: vars.$color-text;
+        }
+
+        p {
+            margin: 6px 0 0;
+            color: vars.$color-text-muted;
+        }
+    }
+}
+
+.suppliers-card {
+    background: #fff;
+    border: 1px solid vars.$color-border;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.suppliers-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.suppliers-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+
+    th,
+    td {
+        padding: 14px 12px;
+        text-align: left;
+        border-bottom: 1px solid vars.$color-border;
+        font-size: 14px;
+    }
+
+    th {
+        background: #f8f9fa;
+        color: vars.$color-text;
+        font-weight: 600;
+    }
+
+    td {
+        color: vars.$color-text;
+    }
+
+    tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    button {
+        margin-right: 8px;
+        padding: 7px 12px;
+        border: 1px solid vars.$color-border;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+
+        &:hover {
+            background: vars.$color-primary;
+            color: #fff;
+            border-color: vars.$color-primary;
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .suppliers-page {
+        padding: 16px;
+
+        &__header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+
+    .suppliers-card {
+        padding: 14px;
+    }
+}

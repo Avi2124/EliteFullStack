@@ -1,0 +1,61 @@
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom"
+import { createCategory } from "../../services/categoryService";
+
+const CreateCategory = () => {
+    const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setError("");
+        if(!name.trim()) {
+            setError("Category name is required.");
+            return;
+        }
+        try {
+            setLoading(true);
+            await createCategory({
+                name: name.trim(),
+            });
+            navigate("/categories");
+        } catch (error) {
+            console.error("Failed to create category:", error);
+            setError("Failed to create category.");            
+        } finally {
+            setLoading(false);
+        }
+    };
+  return (
+    <div className="products-page">
+        <div className="products-page__header">
+            <div>
+                <h1>Create Category</h1>
+                <p>Add a new product category.</p>
+            </div>    
+        </div>      
+
+        <div className="products-card">
+            <form className="product-form" onSubmit={handleSubmit}>
+                <div className="product-form__group product-form__full">
+                    <label htmlFor="name">Category Name</label>
+                    <input type="text" id="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Enter category name" />
+                </div>
+
+                {error && (
+                    <div className="product-form__error">{error}</div>
+                )}
+
+                <div className="product-form__actions">
+                    <button type="button" onClick={() => navigate("/categories")}>Cancle</button>
+                    <button type="submit" disabled={loading}>{loading ? "Creating..." : "Create Category" } </button>
+                </div>
+            </form>
+        </div>
+    </div>
+  );
+}
+
+export default CreateCategory;
