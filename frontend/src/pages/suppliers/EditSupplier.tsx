@@ -1,7 +1,69 @@
-import { useParams } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getSupplierById, updateSupplier } from "../../services/supplierService";
 
 const EditSupplier = () => {
     const {id} = useParams();
+    const navigate = useNavigate();
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const fetchSupplier = async () => {
+            if (!id) {
+                setError("Supplier Id is missing.");
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const supplier = await getSupplierById(id);
+                setName(supplier.name);
+                setEmail(supplier.email);
+                setPhone(supplier.phone);
+            } catch (error) {
+                console.error("Failed to load supplier:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+    }, [id]);
+
+    const handleSubmit = async (event: FormEvent<HTMLElement>) => {
+        event.preventDefault();
+        if(!id) {
+            return;
+        }
+        setError("");
+        if(!name.trim() || !email.trim() || !phone.trim()) {
+            setError("Please fill all fields.");
+            return;
+        }
+
+        try {
+            setSaving(true);
+            await updateSupplier(id, {
+                name: name.trim(),
+                email: email.trim(),
+                phone: phone.trim()
+            });
+            navigate("/suppliers");
+        } catch (error) {
+            console.error("Failed to update supplier:", error);
+            setError("Failed to update supplier.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if(loading) {
+        return <div>Loading supplier...</div>;
+    }
   return (
     <div>
       
@@ -10,93 +72,6 @@ const EditSupplier = () => {
 }
 
 export default EditSupplier
-
-// function EditSupplier() {
-//     const { id } = useParams();
-//     const navigate = useNavigate();
-
-//     const [name, setName] = useState("");
-//     const [email, setEmail] = useState("");
-//     const [phone, setPhone] = useState("");
-
-//     const [loading, setLoading] = useState(true);
-//     const [saving, setSaving] = useState(false);
-//     const [error, setError] = useState("");
-
-//     useEffect(() => {
-//         const fetchSupplier = async () => {
-//             if (!id) {
-//                 setError("Supplier ID is missing.");
-//                 setLoading(false);
-//                 return;
-//             }
-
-//             try {
-//                 const supplier = await getSupplierById(id);
-
-//                 setName(supplier.name);
-//                 setEmail(supplier.email);
-//                 setPhone(supplier.phone);
-//             } catch (error) {
-//                 console.error(
-//                     "Failed to load supplier:",
-//                     error
-//                 );
-
-//                 setError("Failed to load supplier.");
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchSupplier();
-//     }, [id]);
-
-//     const handleSubmit = async (
-//         event: FormEvent<HTMLFormElement>
-//     ) => {
-//         event.preventDefault();
-
-//         if (!id) {
-//             return;
-//         }
-
-//         setError("");
-
-//         if (
-//             !name.trim() ||
-//             !email.trim() ||
-//             !phone.trim()
-//         ) {
-//             setError("Please fill all fields.");
-//             return;
-//         }
-
-//         try {
-//             setSaving(true);
-
-//             await updateSupplier(id, {
-//                 name: name.trim(),
-//                 email: email.trim(),
-//                 phone: phone.trim(),
-//             });
-
-//             navigate("/suppliers");
-//         } catch (error) {
-//             console.error(
-//                 "Failed to update supplier:",
-//                 error
-//             );
-
-//             setError("Failed to update supplier.");
-//         } finally {
-//             setSaving(false);
-//         }
-//     };
-
-//     if (loading) {
-//         return <div>Loading supplier...</div>;
-//     }
 
 //     return (
 //         <div className="products-page">
