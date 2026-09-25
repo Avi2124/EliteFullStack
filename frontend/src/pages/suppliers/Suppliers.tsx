@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
-import { getSuppliers, type Supplier } from "../../services/supplierService";
+import { deleteSupplier, getSuppliers, type Supplier } from "../../services/supplierService";
 import { Edit, Trash } from "lucide-react";
 
 const Suppliers = () => {
@@ -8,6 +8,21 @@ const Suppliers = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const handleDelete = async(id:string) => {
+        const confirmed = window.confirm("Are you sure you want to delete this supplier?");
+        if(!confirmed) {
+            return;
+        }
+
+        try {
+            await deleteSupplier(id);
+            setSuppliers((currentSuppliers) => currentSuppliers.filter((supplier) => supplier.id !== id));
+        } catch (error) {
+            console.error("Failed to delete supplier:", error);
+            alert("Failed to delete supplier. It amy be existing products.");
+        }
+    };
 
     useEffect(() => {
         const fetchSuppliers = async () => {
@@ -63,7 +78,7 @@ const Suppliers = () => {
                                 <td>{supplier.phone}</td>
                                 <td>
                                     <button type="button" onClick={() => navigate(`/suppliers/${supplier.id}/edit`)}><Edit size={18} color="blue" /></button>
-                                    <button type="button"><Trash size={18} color="red" /></button>
+                                    <button type="button" onClick={() => handleDelete(supplier.id)}><Trash size={18} color="red" /></button>
                                 </td>
                             </tr>
                         ))}

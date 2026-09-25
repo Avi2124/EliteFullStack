@@ -32,6 +32,7 @@ const EditSupplier = () => {
                 setLoading(false);
             }
         };
+        fetchSupplier();
     }, [id]);
 
     const handleSubmit = async (event: FormEvent<HTMLElement>) => {
@@ -65,102 +66,47 @@ const EditSupplier = () => {
         return <div>Loading supplier...</div>;
     }
   return (
-    <div>
-      
+    <div className="products-page">
+        <div className="products-page__header">
+            <div>
+                <h1>Edit Suppliers</h1>    
+                <p>Update supplier information.</p>
+            </div>    
+        </div>      
+        <div className="products-card">
+            <form className="product-form" onSubmit={handleSubmit}>
+                <div className="product-form__group">
+                    <label htmlFor="name">Supplier Name</label>
+                    <input type="text" id="name" value={name} onChange={(event) => {
+                        setName(event.target.value)
+                    }} />
+                </div>
+
+                <div className="product-form__group">
+                    <label htmlFor="email">Email</label>
+                    <input type="email" id="email" value={email} onChange={(event) => {
+                        setEmail(event.target.value)
+                    }} />
+                </div>
+
+                <div className="product-form__group">
+                    <label htmlFor="phone">Phone</label>
+                    <input type="text" id="phone" value={phone} onChange={(event) => {
+                        setPhone(event.target.value)
+                    }} />
+                </div>
+                {error && (
+                    <div className="product-form__error">{error}</div>
+                )}
+
+                <div className="product-form__actions">
+                    <button type="button" onClick={() => navigate("/suppliers")}>Cancle</button>
+                    <button type="submit" disabled={saving}>{saving ? "Updating" : "Update Supplier"}</button>
+                </div>
+            </form>
+        </div>
     </div>
-  )
+  );
 }
 
-export default EditSupplier
-
-//     return (
-//         <div className="products-page">
-//             <div className="products-page__header">
-//                 <div>
-//                     <h1>Edit Supplier</h1>
-//                     <p>Update supplier information.</p>
-//                 </div>
-//             </div>
-
-//             <div className="products-card">
-//                 <form
-//                     className="product-form"
-//                     onSubmit={handleSubmit}
-//                 >
-//                     <div className="product-form__group">
-//                         <label htmlFor="name">
-//                             Supplier Name
-//                         </label>
-
-//                         <input
-//                             id="name"
-//                             type="text"
-//                             value={name}
-//                             onChange={(event) =>
-//                                 setName(event.target.value)
-//                             }
-//                         />
-//                     </div>
-
-//                     <div className="product-form__group">
-//                         <label htmlFor="email">
-//                             Email
-//                         </label>
-
-//                         <input
-//                             id="email"
-//                             type="email"
-//                             value={email}
-//                             onChange={(event) =>
-//                                 setEmail(event.target.value)
-//                             }
-//                         />
-//                     </div>
-
-//                     <div className="product-form__group">
-//                         <label htmlFor="phone">
-//                             Phone
-//                         </label>
-
-//                         <input
-//                             id="phone"
-//                             type="text"
-//                             value={phone}
-//                             onChange={(event) =>
-//                                 setPhone(event.target.value)
-//                             }
-//                         />
-//                     </div>
-
-//                     {error && (
-//                         <div className="product-form__error">
-//                             {error}
-//                         </div>
-//                     )}
-
-//                     <div className="product-form__actions">
-//                         <button
-//                             type="button"
-//                             onClick={() =>
-//                                 navigate("/suppliers")
-//                             }
-//                         >
-//                             Cancel
-//                         </button>
-
-//                         <button
-//                             type="submit"
-//                             disabled={saving}
-//                         >
-//                             {saving
-//                                 ? "Updating..."
-//                                 : "Update Supplier"}
-//                         </button>
-//                     </div>
-//                 </form>
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default EditSupplier;
+export default EditSupplier;
