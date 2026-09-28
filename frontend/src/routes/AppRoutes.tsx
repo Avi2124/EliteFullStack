@@ -12,6 +12,7 @@ import EditCategory from "../pages/categories/EditCategory"
 import Suppliers from "../pages/suppliers/Suppliers"
 import CreateSupplier from "../pages/suppliers/CreateSupplier"
 import EditSupplier from "../pages/suppliers/EditSupplier"
+import Inventory from "../pages/inventory/Inventory"
 
 const AppRoutes = () => {
   return (  
@@ -30,6 +31,7 @@ const AppRoutes = () => {
                     <Route path="/suppliers" element={<Suppliers />} />
                     <Route path="/suppliers/create" element={<CreateSupplier />} />
                     <Route path="/suppliers/:id/edit" element={<EditSupplier />} />
+                    <Route path="/inventory" element={<Inventory />} />
                 </Route>
             </Route>
             
