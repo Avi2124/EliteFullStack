@@ -1,0 +1,326 @@
+@use "variables" as vars;
+
+.transactions-page {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+
+    &__header {
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 24px;
+            font-weight: 600;
+            color: vars.$color-text;
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+            color: vars.$color-text-secondary;
+        }
+    }
+}
+
+.transactions-card {
+    background: vars.$color-background;
+    border: 1px solid vars.$color-border;
+    border-radius: 10px;
+    overflow: hidden;
+
+    &__header {
+        padding: 20px 24px;
+        border-bottom: 1px solid vars.$color-border;
+
+        h2 {
+            margin: 0 0 5px;
+            font-size: 18px;
+            font-weight: 600;
+            color: vars.$color-text;
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: vars.$color-text-secondary;
+        }
+    }
+}
+
+.transactions-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.transactions-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 14px 20px;
+        text-align: left;
+        border-bottom: 1px solid vars.$color-border;
+        font-size: 14px;
+    }
+
+    th {
+        background: vars.$color-background;
+        color: vars.$color-text-secondary;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    td {
+        color: vars.$color-text;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background: vars.$color-background;
+    }
+}
+
+.transaction-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &--in {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    &--out {
+        color: #dc2626;
+        background: #fee2e2;
+    }
+}
+
+.transactions-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 16px 20px;
+    border-top: 1px solid vars.$color-border;
+
+    span {
+        min-width: 90px;
+        text-align: center;
+        font-size: 14px;
+        color: vars.$color-text-secondary;
+    }
+
+    button {
+        padding: 8px 14px;
+        border: 1px solid vars.$color-border;
+        border-radius: 6px;
+        background: vars.$color-primary;
+        color: vars.$color-white;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.2s ease;
+
+        
+        &:hover:not(:disabled) {
+            background: vars.$color-background;
+        }
+        
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.myBtn {
+    background: vars.$color-primary;
+    color: vars.$color-white;
+
+    &:hover {
+        background: vars.$color-primary-dark;
+    }
+}
+
+@media (max-width: 600px) {
+    .transactions-page {
+        padding: 16px;
+
+        &__header {
+            align-items: flex-start;
+            flex-direction: column;
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    }
+
+    .transaction-modal {
+        padding: 12px;
+
+        &__content {
+            max-height: calc(100vh - 24px);
+        }
+    }
+
+    .transaction-form {
+        padding: 18px;
+
+        &__actions {
+            flex-direction: column-reverse;
+
+            .btn {
+                width: 100%;
+            }
+        }
+    }
+}
+
+// Create Transaction Modal
+.transaction-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    &__content {
+        width: 100%;
+        max-width: 520px;
+        max-height: calc(100vh - 40px);
+
+        overflow-y: auto;
+
+        background: vars.$color-background;
+        border: 1px solid vars.$color-border;
+        border-radius: 10px;
+
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        padding: 20px 24px;
+
+        border-bottom: 1px solid vars.$color-border;
+
+        h2 {
+            margin: 0 0 5px;
+
+            font-size: 18px;
+            font-weight: 600;
+            color: vars.$color-text;
+        }
+
+        p {
+            margin: 0;
+
+            font-size: 13px;
+            color: vars.$color-text-secondary;
+        }
+    }
+
+    &__close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 32px;
+        height: 32px;
+
+        padding: 0;
+
+        border: none;
+        border-radius: 6px;
+
+        background: transparent;
+        color: vars.$color-text-secondary;
+
+        font-size: 24px;
+        line-height: 1;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+
+        &:hover:not(:disabled) {
+            background: vars.$color-background;
+            color: vars.$color-text;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// Transaction Form
+.transaction-form {
+    display: grid;
+    gap: 18px;
+
+    padding: 24px;
+
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: vars.$color-text;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        padding-top: 6px;
+    }
+}
