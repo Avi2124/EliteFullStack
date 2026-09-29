@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { getCategories, type Category } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
 import { getProductById, updateProduct } from "../../services/productService";
+import Loading from "../../components/common/Loading";
 
 const EditProduct = () => {
     const {id} = useParams();
@@ -78,7 +79,7 @@ const EditProduct = () => {
 
     if(loading) {
         return (
-            <div className="products-page"><h2>Loading product...</h2></div>
+            <div className="products-page"><h2><Loading /></h2></div>
         );
     }
 

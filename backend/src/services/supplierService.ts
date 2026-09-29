@@ -1,9 +1,10 @@
 import supplierRepository from "../repositories/supplierRepository.js";
 import AppError from "../utils/AppError.js";
 import type { CreateSupplierInput } from "../validators/supplierValidation.js";
+import auditLogService from "./auditLogService.js";
 
 class SupplierService {
-  async create(data: CreateSupplierInput) {
+  async create(data: CreateSupplierInput, userId: string) {
     if (data.email) {
       const exists = await supplierRepository.findByEmail(data.email);
       if (exists) {
@@ -15,7 +16,19 @@ class SupplierService {
       email: data.email ?? null,
       phone: data.phone ?? null,
     };
-    return supplierRepository.create(cleanData);
+    const supplier = await supplierRepository.create(cleanData);
+    await auditLogService.createLog({
+      user: {
+        connect:{
+          id:userId
+        },
+      },
+      action: "CREATE",
+      entity: "Supplier",
+      entityId: supplier.id,
+      details: `Supplier "${supplier.name}" created successfully.`
+    });
+    return supplier;
   }
 
   async findAll() {
@@ -30,17 +43,41 @@ class SupplierService {
     return supplier;
   }
 
-  async update(id: string, data: Partial<CreateSupplierInput>) {
+  async update(id: string, data: Partial<CreateSupplierInput>, userId: string) {
     await this.findById(id);
     const cleanData = Object.fromEntries(
       Object.entries(data).filter(([, value]) => value !== undefined)
     );
-    return supplierRepository.update(id, cleanData);
+    const supplier = await supplierRepository.update(id, cleanData);
+    await auditLogService.createLog({
+      user: {
+        connect: {
+          id: userId
+        },
+      },
+      action: "UPDATE",
+      entity: "Supplier",
+      entityId: supplier.id,
+      details: `Supplier "${supplier.name}" updated successfully.`
+    });
+    return supplier;
   }
 
-  async delete(id: string) {
-    await this.findById(id);
-    return supplierRepository.delete(id);
+  async delete(id: string, userId: string) {
+    const supplier = await this.findById(id);
+    const deletedSupplier = await supplierRepository.delete(id);
+    await auditLogService.createLog({
+      user: {
+        connect: {
+          id: userId
+        },
+      },
+      action: "DELETE",
+      entity: "Supplier",
+      entityId: supplier.id,
+      details: `Supplier "${supplier.name}" deleted successfully.`
+    });
+    return deletedSupplier;
   }
 }
 export default new SupplierService();

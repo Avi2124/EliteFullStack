@@ -1,6 +1,7 @@
 import { Boxes, Package, Truck, Warehouse, AlertTriangle, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getDashboard, type DashboardData } from "../../services/dashboardService";
+import Loading from "../../components/common/Loading";
 
 function Dashboard() {
     const [dashboard, setDashboard] = useState<DashboardData | null>(null);
@@ -26,7 +27,7 @@ function Dashboard() {
 
     if(loading) {
         return (
-            <div className="dashboard-page"><p>Loading Dashboard...</p></div>
+            <div className="dashboard-page"><p><Loading /></p></div>
         );
     }
 

@@ -17,6 +17,8 @@ import Transactions from "../pages/transactions/Transactions"
 import Users from "../pages/users/Users"
 import CreateUser from "../pages/users/CreateUser"
 import EditUser from "../pages/users/EditUser"
+import AuditLogs from "../pages/auditLogs/AuditLogs"
+import Email from "../pages/email/Email"
 
 const AppRoutes = () => {
   return (  
@@ -40,6 +42,8 @@ const AppRoutes = () => {
                     <Route path="/users" element={<Users />} />
                     <Route path="/users/create" element={<CreateUser />} />
                     <Route path="/users/:id/edit" element={<EditUser />} />
+                    <Route path="/audit-logs" element={<AuditLogs />} />
+                    <Route path="/email" element={<Email />} />
                 </Route>
             </Route>
             

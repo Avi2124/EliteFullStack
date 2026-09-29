@@ -9,6 +9,7 @@ import {
   type UserRole,
   updateUserStatus,
 } from "../../services/userService";
+import Loading from "../../components/common/Loading";
 
 const Users = () => {
   const navigate = useNavigate();
@@ -159,7 +160,7 @@ const Users = () => {
 
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="users-table__loading">Loading users...</td></tr>
+                <tr><td colSpan={5} className="users-table__loading"><Loading /></td></tr>
                     ): users.length === 0 ? (
                 <tr>
                   <td

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { deleteSupplier, getSuppliers, type Supplier } from "../../services/supplierService";
 import { Edit, Trash } from "lucide-react";
+import Loading from "../../components/common/Loading";
 
 const Suppliers = () => {
     const navigate = useNavigate();
@@ -42,7 +43,7 @@ const Suppliers = () => {
     }, []);
 
     if(loading) {
-        return <div>Loading suppliers...</div>;
+        return <div><Loading /></div>;
     }
 
     if(error) {

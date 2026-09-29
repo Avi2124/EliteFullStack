@@ -7,7 +7,7 @@ import { sendResponse } from "../utils/response.js";
 class SupplierController {
   create = asyncHandler(async (req: Request, res: Response) => {
     const data = createSupplierSchema.parse(req.body);
-    const supplier = await supplierService.create(data);
+    const supplier = await supplierService.create(data, req.user!.id);
     return sendResponse(res, {
       success: true,
       statusCode: 201,
@@ -38,7 +38,7 @@ class SupplierController {
 
   update = asyncHandler(async(req:Request, res:Response) => {
     const data = updateSupplierSchema.parse(req.body);
-    const supplier = await supplierService.update(req.params.id as string, data);
+    const supplier = await supplierService.update(req.params.id as string, data, req.user!.id);
     return sendResponse(res, {
         success: true,
         statusCode: 200,
@@ -48,7 +48,7 @@ class SupplierController {
   });
 
   delete = asyncHandler(async(req:Request, res:Response) => {
-    await supplierService.delete(req.params.id as string);
+    await supplierService.delete(req.params.id as string, req.user!.id);
     return sendResponse(res, {
         success: true,
         statusCode: 200,

@@ -5,6 +5,7 @@ import {
     updateUser,
     type UserRole,
 } from "../../services/userService";
+import Loading from "../../components/common/Loading";
 
 const EditUser = () => {
     const { id } = useParams();
@@ -85,7 +86,7 @@ const EditUser = () => {
     };
 
     if (loading) {
-        return <div>Loading user...</div>;
+        return <div><Loading /></div>;
     }
 
     return (

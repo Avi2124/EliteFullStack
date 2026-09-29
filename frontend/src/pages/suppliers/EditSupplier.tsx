@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getSupplierById, updateSupplier } from "../../services/supplierService";
+import Loading from "../../components/common/Loading";
 
 const EditSupplier = () => {
     const {id} = useParams();
@@ -63,7 +64,7 @@ const EditSupplier = () => {
     };
 
     if(loading) {
-        return <div>Loading supplier...</div>;
+        return <div><Loading /></div>;
     }
   return (
     <div className="products-page">

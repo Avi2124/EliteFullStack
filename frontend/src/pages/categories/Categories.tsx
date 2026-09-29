@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { deleteCategory, getCategories, type Category } from "../../services/categoryService";
 import { Edit, PlusCircle, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/common/Loading";
 
 
 const Categories = () => {
@@ -29,7 +30,7 @@ const Categories = () => {
     }, []);
 
     if(loading) {
-        return <div>Loading categories...</div>;
+        return <div><Loading /></div>;
     }
 
     if(error) {
