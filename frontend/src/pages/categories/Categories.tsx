@@ -82,7 +82,7 @@ const Categories = () => {
             {deleteError && (
                 <ErrorMessage message={deleteError} />
             )}
-            <div className="categories-table">
+            <table className="categories-table">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -104,7 +104,7 @@ const Categories = () => {
                         </tr>
                     ))}
                 </tbody>
-            </div>
+            </table>
         </div>
     </div>
   );
