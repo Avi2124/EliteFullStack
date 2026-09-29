@@ -106,14 +106,6 @@
             background vars.$transition-fast,
             border-color vars.$transition-fast;
 
-        &:hover {
-            background: vars.$color-primary;
-            border-color: vars.$color-primary;
-
-            svg {
-                color: #fff !important;
-            }
-        }
     }
 }
 

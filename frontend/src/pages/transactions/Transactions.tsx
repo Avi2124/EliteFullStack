@@ -196,10 +196,7 @@ function Transactions() {
                                 <tr>
                                     <td
                                         colSpan={6}
-                                        style={{
-                                            textAlign:
-                                                "center",
-                                        }}
+                                        className="transactions-table__empty"
                                     >
                                         No transactions
                                         found.
