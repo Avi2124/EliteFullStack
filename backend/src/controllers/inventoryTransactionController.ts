@@ -19,12 +19,16 @@ class InventoryTransactionController {
         if(type !== "STOCK_IN" && type !== "STOCK_OUT") {
             throw new AppError("Transaction type must be STOCK_IN ot STOCK_OUT.", 400);
         }
+        const userId = req.user?.id;
+        if (!userId) {
+            throw new AppError("Authenticated user is required.", 401);
+        }
         const transaction = await inventoryTransactionService.createTransaction({
             productId,
             type,
             quantity: Number(quantity),
             remarks
-        });
+        }, userId);
         return sendResponse(res, {
             success: true,
             statusCode: 201,

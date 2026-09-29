@@ -4,6 +4,7 @@ import { type Category, getCategories } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
 import { Edit, PlusCircle, Search, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/common/Loading";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ const Products = () => {
   if (loading) {
     return (
       <div className="products-page">
-        <h2>Loading Products...</h2>
+        <h2><Loading /></h2>
       </div>
     );
   }

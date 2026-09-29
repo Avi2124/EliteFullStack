@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getProducts, type Product } from "../../services/productService";
 import { getCategories, type Category } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
+import Loading from "../../components/common/Loading";
 
 function Inventory() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -64,7 +65,7 @@ function Inventory() {
         return (
             <div className="inventory-page">
                 <div className="inventory-card">
-                    Loading inventory...
+                    <Loading />
                 </div>
             </div>
         );

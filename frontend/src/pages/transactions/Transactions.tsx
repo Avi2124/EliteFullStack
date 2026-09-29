@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { getInventoryTransactions, createInventoryTransaction, type InventoryTransaction, type InventoryTransactionType } from "../../services/inventoryTransactionService";
 import { getProducts, type Product } from "../../services/productService";
+import Loading from "../../components/common/Loading";
 function Transactions() {
     const [transactions, setTransactions] = useState<InventoryTransaction[]>([]);
     const [page, setPage] = useState(1);
@@ -114,7 +115,7 @@ function Transactions() {
         return (
             <div className="transactions-page">
                 <div className="transactions-card">
-                    Loading transaction history...
+                    <Loading />
                 </div>
             </div>
         );

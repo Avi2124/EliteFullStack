@@ -4,6 +4,7 @@ import {
   getCategoriesById,
   updateCategory,
 } from "../../services/categoryService";
+import Loading from "../../components/common/Loading";
 
 const EditCategory = () => {
   const { id } = useParams();
@@ -59,7 +60,7 @@ const EditCategory = () => {
   };
 
   if (loading) {
-    return <div>Loading category...</div>;
+    return <div><Loading /></div>;
   }
   return (
     <div className="products-page">

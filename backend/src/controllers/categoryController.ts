@@ -11,7 +11,7 @@ class CategoryController {
   create = asyncHandler(async (req: Request, res: Response) => {
     const data = createCategorySchema.parse(req.body);
 
-    const category = await categoryService.create(data);
+    const category = await categoryService.create(data, req.user!.id);
 
     return sendResponse(res, {
       success: true,
@@ -46,7 +46,7 @@ class CategoryController {
   update = asyncHandler(async (req: Request, res: Response) => {
     const data = updateCategorySchema.parse(req.body);
 
-    const category = await categoryService.update(req.params.id as string, data);
+    const category = await categoryService.update(req.params.id as string, data, req.user!.id);
 
     return sendResponse(res, {
       success: true,
@@ -57,7 +57,7 @@ class CategoryController {
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
-    await categoryService.delete(req.params.id as string);
+    await categoryService.delete(req.params.id as string, req.user!.id);
 
     return sendResponse(res, {
       success: true,
