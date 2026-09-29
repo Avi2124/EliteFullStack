@@ -15,6 +15,10 @@
   }
 }
 
+/* =========================
+   SIDEBAR
+========================= */
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -22,25 +26,48 @@
   width: vars.$sidebar-width;
   height: 100vh;
   z-index: 100;
+
   display: flex;
   flex-direction: column;
+
   background: vars.$color-sidebar;
   color: #fff;
 
   &__brand {
     height: vars.$topbar-height;
+
     display: flex;
     align-items: center;
+
     padding: 0 18px;
+
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   &__logo {
     width: 150px;
+    display: flex;
+    align-items: center;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
   }
 
   &__close {
     display: none;
+    place-items: center;
+
+    margin-left: auto;
+
+    border: 0;
+    background: transparent;
+    color: #fff;
+
+    cursor: pointer;
   }
 
   &__nav {
@@ -50,16 +77,24 @@
 
   &__link {
     position: relative;
+
     min-height: 42px;
+
     display: flex;
     align-items: center;
+
     gap: 11px;
+
     padding: 0 12px;
     margin-bottom: 4px;
+
     border-radius: vars.$radius-md;
+
     color: #94a3b8;
+
     font-size: 13px;
     font-weight: 500;
+
     transition:
       background vars.$transition-fast,
       color vars.$transition-fast;
@@ -75,13 +110,17 @@
 
       &::before {
         content: "";
+
         position: absolute;
         left: 0;
         top: 7px;
         bottom: 7px;
+
         width: 3px;
+
         border-radius: 0 4px 4px 0;
-        background: vars.$color-primary;
+
+        background: #fff;
       }
     }
   }
@@ -89,6 +128,7 @@
   &__bottom {
     margin-top: auto;
     padding: 15px;
+
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -96,24 +136,38 @@
     display: flex;
     align-items: center;
     gap: 9px;
+
+    min-width: 0;
   }
 
   &__avatar {
+    flex: 0 0 32px;
+
     width: 32px;
     height: 32px;
+
     display: grid;
     place-items: center;
+
     border-radius: 50%;
+
     background: #dbeafe;
     color: vars.$color-primary;
+
     font-size: 12px;
     font-weight: 700;
   }
 
   &__user-info {
+    min-width: 0;
+
     strong,
     span {
       display: block;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     strong {
@@ -123,23 +177,36 @@
 
     span {
       margin-top: 2px;
+
       color: #7f94ac;
       font-size: 12px;
     }
   }
 }
 
+/* =========================
+   SIDEBAR LOGOUT
+========================= */
+
 .sidebar__logout {
   display: flex;
   align-items: center;
+
   border: 1px solid #ff4c4c;
   border-radius: 5px;
+
   background: #ffecec;
   color: #ff4c4c;
+
   font-weight: 600;
+
   margin: 5px;
   padding: 5px;
+
   gap: 5px;
+
+  cursor: pointer;
+
   transition: 0.3s ease;
 
   &:hover {
@@ -148,19 +215,57 @@
   }
 }
 
+/* =========================
+   SIDEBAR OVERLAY
+========================= */
+
 .sidebar-overlay {
   display: none;
 }
 
+.topbar__logout {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 5px 8px;
+
+  border: 1px solid #ff4c4c;
+  border-radius: 5px;
+
+  background: #ffecec;
+  color: #ff4c4c;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+
+  &:hover {
+    background: #ff4c4c;
+    color: #ffffff;
+  }
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
 .topbar {
   height: vars.$topbar-height;
+
   position: sticky;
   top: 0;
   z-index: 50;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0 22px;
+
   background: vars.$color-white;
   border-bottom: 1px solid vars.$color-border;
 
@@ -170,57 +275,100 @@
     align-items: center;
   }
 
+  &__left {
+    min-width: 0;
+    flex: 1;
+  }
+
   &__search {
     width: 360px;
+
     display: flex;
     align-items: center;
+
     gap: 8px;
+
     padding: 0 11px;
+
     border: 1px solid vars.$color-border;
     border-radius: 8px;
+
     color: vars.$color-text-muted;
 
     input {
       width: 100%;
+      min-width: 0;
+
       padding: 9px 0;
+
       border: 0;
       outline: 0;
+
       font-size: 12px;
+      background: transparent;
     }
   }
 
   &__menu {
     display: none;
+
+    place-items: center;
+
+    border: 0;
+    background: transparent;
+
+    color: vars.$color-text;
+
+    cursor: pointer;
   }
 
   &__right {
+    flex-shrink: 0;
     gap: 18px;
   }
 
   &__notification {
     position: relative;
+
+    display: grid;
+    place-items: center;
+
+    padding: 0;
+
     border: 0;
     background: transparent;
+
     color: vars.$color-text-secondary;
+
+    cursor: pointer;
   }
 
   &__notification-dot {
     position: absolute;
+
     top: 0;
     right: -1px;
+
     width: 6px;
     height: 6px;
+
     border-radius: 50%;
+
     background: vars.$color-danger;
   }
 
   &__user {
     display: flex;
     align-items: center;
+
     gap: 8px;
+
+    min-width: 0;
   }
 
   &__avatar {
+    flex: 0 0 30px;
+
     width: 30px;
     height: 30px;
 
@@ -237,9 +385,15 @@
   }
 
   &__user-info {
+    min-width: 0;
+
     strong,
     span {
       display: block;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     strong {
@@ -253,6 +407,10 @@
   }
 }
 
+/* =========================
+   TABLET
+========================= */
+
 @media (max-width: 800px) {
   .dashboard-layout {
     &__content {
@@ -262,6 +420,7 @@
 
   .sidebar {
     transform: translateX(-100%);
+
     transition: transform 0.25s ease;
 
     &--open {
@@ -270,11 +429,6 @@
 
     &__close {
       display: grid;
-      place-items: center;
-      margin-left: auto;
-      border: 0;
-      background: transparent;
-      color: #fff;
     }
   }
 
@@ -282,6 +436,7 @@
     position: fixed;
     inset: 0;
     z-index: 90;
+
     background: rgba(0, 0, 0, 0.45);
 
     &--visible {
@@ -292,25 +447,28 @@
   .topbar {
     &__menu {
       display: grid;
-      place-items: center;
+
       margin-right: 12px;
-      border: 0;
-      background: transparent;
-      color: vars.$color-text;
     }
 
     &__search {
-      width: 260px;
+      width: min(360px, 100%);
     }
   }
 }
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 550px) {
   .topbar {
     padding: 0 14px;
 
     &__search {
-      width: 180px;
+      flex: 1;
+      width: auto;
+      min-width: 0;
     }
 
     &__user-info {
@@ -321,12 +479,47 @@
       gap: 10px;
     }
   }
+
+  .sidebar {
+    width: min(280px, 85vw);
+  }
 }
+
+/* =========================
+   SMALL MOBILE
+========================= */
 
 @media (max-width: 400px) {
   .topbar {
-    &__search {
-      width: 140px;
+    padding: 0 10px;
+
+    &__logout {
+      padding: 5px;
+
+      span {
+        display: none;
+      }
     }
+
+
+    &__menu {
+      margin-right: 6px;
+    }
+
+    &__search {
+      padding: 0 8px;
+
+      input {
+        font-size: 11px;
+      }
+    }
+
+    &__right {
+      gap: 7px;
+    }
+  }
+
+  .sidebar {
+    width: 270px;
   }
 }

@@ -36,7 +36,7 @@ const CreateProduct = () => {
         fetchData();
     }, []);
 
-    const handelSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError("");
         if(!name || !sku || !price || !categoryId || !supplierId) {
@@ -70,7 +70,7 @@ const CreateProduct = () => {
         </div>      
 
         <div className="products-card">
-            <form className="product-form" onSubmit={handelSubmit}>
+            <form className="product-form" onSubmit={handleSubmit}>
                 {error && (
                     <div className="product-form__error">
                         {error}

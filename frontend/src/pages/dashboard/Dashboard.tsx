@@ -2,6 +2,7 @@ import { Boxes, Package, Truck, Warehouse, AlertTriangle, XCircle } from "lucide
 import { useEffect, useState } from "react";
 import { getDashboard, type DashboardData } from "../../services/dashboardService";
 import Loading from "../../components/common/Loading";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 function Dashboard() {
     const [dashboard, setDashboard] = useState<DashboardData | null>(null);
@@ -17,7 +18,7 @@ function Dashboard() {
                 setDashboard(data);
             } catch (error) {
                 console.error("Failed to load dashboard:", error);
-                setError("Failed to load dahsboard data");
+                setError("Failed to load dashboard data");
             } finally {
                 setLoading(false);
             }
@@ -27,13 +28,13 @@ function Dashboard() {
 
     if(loading) {
         return (
-            <div className="dashboard-page"><p><Loading /></p></div>
+            <div className="dashboard-page"><Loading /></div>
         );
     }
 
     if (error) {
         return (
-            <div className="dashboard-page"><p>{error}</p></div>
+            <div className="dashboard-page"><ErrorMessage message={error} /></div>
         );
     }
 

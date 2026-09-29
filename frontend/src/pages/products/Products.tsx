@@ -95,13 +95,24 @@ const Products = () => {
 
   const getStockStatus = (quantity: number, minStock: number) => {
     if (quantity === 0) {
-      return "Out of Stock";
+        return {
+            label: "Out of Stock",
+            className: "stock-status--out-of-stock",
+        };
     }
+
     if (quantity < minStock) {
-      return "Low Stock";
+        return {
+            label: "Low Stock",
+            className: "stock-status--low-stock",
+        };
     }
-    return "In Stock";
-  };
+
+    return {
+        label: "In Stock",
+        className: "stock-status--in-stock",
+    };
+};
 
   const redirect = () => {
     navigate("/products/create");
@@ -212,7 +223,7 @@ const Products = () => {
           </div>
         </div>
 
-        <div className="products table-wrapper">
+        <div className="products-table-wrapper">
           <table className="products-table">
             <thead>
               <tr>
@@ -237,7 +248,20 @@ const Products = () => {
                   <td>{product.price}</td>
                   <td>{product.quantity}</td>
                   <td>{product.minStock}</td>
-                  <td>{getStockStatus(product.quantity, product.minStock)}</td>
+                  <td>
+                      {(() => {
+                          const status = getStockStatus(
+                              product.quantity,
+                              product.minStock
+                          );
+                        
+                          return (
+                              <span className={`stock-status ${status.className}`}>
+                                  {status.label}
+                              </span>
+                          );
+                      })()}
+                  </td>
                   <td>
                     {canEdit && (<button type="button"><Edit size={18} color="blue" onClick={() => navigate(`/products/${product.id}/edit`)} /></button>)}
                     {canDelete && (<button type="button"><Trash size={18} color="red" onClick={() => handleDelete(product.id)} /></button>)}

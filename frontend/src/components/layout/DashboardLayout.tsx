@@ -34,7 +34,7 @@ const handleLogout = () => {
                                 <strong>{user?.name}</strong>
                                 <span>{user?.role}</span>
                             </div>
-                            <button type="button" className="sidebar__logout" onClick={handleLogout}><LogOut size={16} />
+                            <button type="button" className="topbar__logout" onClick={handleLogout}><LogOut size={16} />
                     <span>Logout</span></button>
                         </div>
                     </div>

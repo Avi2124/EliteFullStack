@@ -4,6 +4,7 @@ import { getCategories, type Category } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
 import { getProductById, updateProduct } from "../../services/productService";
 import Loading from "../../components/common/Loading";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const EditProduct = () => {
     const {id} = useParams();
@@ -79,13 +80,13 @@ const EditProduct = () => {
 
     if(loading) {
         return (
-            <div className="products-page"><h2><Loading /></h2></div>
+            <div className="products-page"><Loading /></div>
         );
     }
 
     if(error) {
         return (
-            <div className="products-page"><h2>{error}</h2></div>
+            <div className="products-page"><ErrorMessage message={error} /></div>
         );
     }
 
@@ -151,7 +152,7 @@ const EditProduct = () => {
                 </div>
 
                 <div className="product-form__actions">
-                    <button type="button" onClick={() => navigate("/products")}>Cancle</button>
+                    <button type="button" onClick={() => navigate("/products")}>Cancel</button>
                     <button type="submit" disabled={saving}>{saving ? "Updating..." : "Update Product"}</button>
                 </div>
 
