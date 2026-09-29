@@ -11,6 +11,7 @@ import {
 } from "../../services/userService";
 import Loading from "../../components/common/Loading";
 import { useAuth } from "../../context/AuthContext";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const Users = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Users = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "">("");
+  const [deleteError, setDeleteError] = useState("");
 
   const { user } = useAuth();
 
@@ -48,8 +50,7 @@ const Users = () => {
       setUsers((currentUsers) => currentUsers.filter((user) => user.id !== id));
     } catch (error) {
       console.error("Failed to delete user:", error);
-
-      alert("Failed to delete user.");
+      setDeleteError("Failed to delete user.");
     }
   };
 
@@ -99,12 +100,16 @@ const Users = () => {
       );
     } catch (error) {
       console.error("Failed to update user status:", error);
-      alert("Failed to update user status.");
+      setError("Failed to update user status.");
     }
   };
 
   if (error) {
-    return <div>{error}</div>;
+      return (
+          <div className="users-page">
+              <ErrorMessage message={error} />
+          </div>
+      );
   }
 
   return (
@@ -168,6 +173,7 @@ const Users = () => {
 
       {/* Users Card */}
       <div className="users-card">
+        {deleteError && <ErrorMessage message={deleteError} />}
         <div className="users-table-wrapper">
           <table className="users-table">
             <thead>
