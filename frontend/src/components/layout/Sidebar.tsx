@@ -1,11 +1,11 @@
 import { BarChart3, Boxes, ClipboardList, FileText, LayoutDashboard, Mail, Package, Truck, Users, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
 }
-
 const menuItems = [
     {
         label: "Dashboard",path: "/dashboard", icon: LayoutDashboard
@@ -31,12 +31,26 @@ const menuItems = [
     {
         label: "Audit Logs", path: "/audit-logs", icon: FileText
     },
-    {
-        label: "Email", path: "/email", icon: Mail
-    },
 ];
 
 function Sidebar ({isOpen, onClose}: SidebarProps) {
+    const { user } = useAuth();
+    const items = menuItems.filter((item) => {
+        if(item.path === "/users") {
+            return user?.role === "ADMIN" || user?.role === "MANAGER";
+        }
+        if(item.path === "/audit-logs") {
+            return user?.role === "ADMIN" || user?.role === "MANAGER";
+        }
+        return true;
+    });
+
+    if(user?.role === "ADMIN") {
+        items.push({
+            label: "Email", path: "/email", icon: Mail
+        });
+    }
+    
   return (
     <>
         <div className={`sidebar-overlay ${isOpen ? "sidebar-overlay--visible" : ""}`} onClick={onClose} />
@@ -49,7 +63,7 @@ function Sidebar ({isOpen, onClose}: SidebarProps) {
             </div>
 
             <nav className="sidebar__nav">
-                {menuItems.map((item) => {
+                {items.map((item) => {
                     const Icon = item.icon;
                     return (
                         <NavLink key={item.path} to={item.path} onClick={onClose} className={({isActive}) => `sidebar__link ${isActive ? "sidebar__link--active" : ""}`} ><Icon size={18} /><span>{item.label}</span></NavLink>
@@ -58,10 +72,10 @@ function Sidebar ({isOpen, onClose}: SidebarProps) {
             </nav>
             <div className="sidebar__bottom">
                 <div className="sidebar__user">
-                    <div className="sidebar__avatar">A</div>
+                    <div className="sidebar__avatar">{user?.name?.charAt(0).toUpperCase()}</div>
                     <div className="sidebar__user-info">
-                        <strong>Avi Italiya</strong>
-                        <span>Admin</span>
+                        <strong>{user?.name}</strong>
+                        <span>{user?.role}</span>
                     </div>
                 </div>
             </div>

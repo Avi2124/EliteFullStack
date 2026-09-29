@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { type AuditLog, getAuditLogs } from "../../services/auditLogService";
 import Loading from "../../components/common/Loading";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const AuditLogs = () => {
 
@@ -53,13 +54,12 @@ const AuditLogs = () => {
     if(error) {
         return (
             <div className="audit-logs-page">
-                <div className="audit-logs-card">{error}</div>
+                <ErrorMessage message={error} />
             </div>
         );
     }
 
   return (
-    <div>
     <div className="audit-logs-page">
         <div className="audit-logs-page__header">
             <div>
@@ -135,7 +135,6 @@ const AuditLogs = () => {
                     <button type="button" disabled={page === totalPages} onClick={() => setPage((currentPage) => currentPage + 1)}>Next</button>
             </div>
         </div>
-    </div>
     </div>
   );
 };

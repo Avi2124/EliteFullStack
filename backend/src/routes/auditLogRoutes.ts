@@ -7,7 +7,7 @@ import authorize from "../middlewares/roleMiddleware.js";
 
 const auditLogRoutes = Router();
 
-auditLogRoutes.get("/", authMiddleware, authorize(Role.ADMIN), auditLogController.findAll);
-auditLogRoutes.get("/:id", authMiddleware, authorize(Role.ADMIN), auditLogController.findById);
+auditLogRoutes.get("/", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), auditLogController.findAll);
+auditLogRoutes.get("/:id", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), auditLogController.findById);
 
 export default auditLogRoutes;

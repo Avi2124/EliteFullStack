@@ -6,6 +6,7 @@ import {
     type UserRole,
 } from "../../services/userService";
 import Loading from "../../components/common/Loading";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const EditUser = () => {
     const { id } = useParams();
@@ -141,11 +142,7 @@ const EditUser = () => {
                         </select>
                     </div>
 
-                    {error && (
-                        <p className="product-form__error">
-                            {error}
-                        </p>
-                    )}
+                    {error && <ErrorMessage message={error} />}
 
                     <div className="product-form__actions">
                         <button

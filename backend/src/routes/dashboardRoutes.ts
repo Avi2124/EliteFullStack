@@ -6,6 +6,6 @@ import authorize from "../middlewares/roleMiddleware.js";
 
 const dashboardRouter = Router();
 
-dashboardRouter.get("/", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), dashboardController.getDashboard);
+dashboardRouter.get("/", authMiddleware, authorize(Role.ADMIN, Role.MANAGER, Role.STAFF), dashboardController.getDashboard);
 
 export default dashboardRouter;

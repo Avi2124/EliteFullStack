@@ -3,6 +3,7 @@ import { getProducts, type Product } from "../../services/productService";
 import { getCategories, type Category } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
 import Loading from "../../components/common/Loading";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 function Inventory() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -14,6 +15,7 @@ function Inventory() {
     const [categoryId, setCategoryId] = useState("");
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [supplierId, setSupplierId] = useState("");
+    const [filterError, setFilterError] = useState("");
 
     useEffect(() => {
         const fetchFilters = async () => {
@@ -25,8 +27,11 @@ function Inventory() {
                     ]);
                 setCategories(categoryData);
                 setSuppliers(supplierData);
+                setFilterError("");
             } catch (error) {
                 console.error("Failed to load inventory filters:", error);
+                setError("Failed to load inventory filters.");
+
             }
         };
         fetchFilters();
@@ -63,21 +68,23 @@ function Inventory() {
 
     if (loading) {
         return (
-            <div className="inventory-page">
-                <div className="inventory-card">
-                    <Loading />
-                </div>
+        <div className="inventory-page">
+            <div className="inventory-card">
+                <Loading />
             </div>
+        </div>
         );
     }
 
     if (error) {
         return (
-            <div className="inventory-page">
-                <div className="inventory-card">
-                    {error}
-                </div>
+        <div className="inventory-page">
+            <div className="inventory-card">
+                {filterError && (
+                    <ErrorMessage message={filterError} />
+                )}
             </div>
+        </div>
         );
     }
 

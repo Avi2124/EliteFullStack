@@ -4,6 +4,7 @@ import {
     createUser,
     type UserRole,
 } from "../../services/userService";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 const CreateUser = () => {
     const navigate = useNavigate();
@@ -108,11 +109,7 @@ const CreateUser = () => {
                         </select>
                     </div>
 
-                    {error && (
-                        <p className="product-form__error">
-                            {error}
-                        </p>
-                    )}
+                    {error && <ErrorMessage message={error} />}
 
                     <div className="product-form__actions">
                         <button

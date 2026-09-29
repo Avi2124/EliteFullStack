@@ -5,6 +5,8 @@ import { getSuppliers, type Supplier } from "../../services/supplierService";
 import { Edit, PlusCircle, Search, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
+import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAuth } from "../../context/AuthContext";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -21,6 +23,11 @@ const Products = () => {
   const [supplierId, setSupplierId] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [order, setOrder] = useState("desc");
+  const [deleteError, setDeleteError] = useState("");
+  const { user } = useAuth();
+  const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canDelete = user?.role === "ADMIN";
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -73,7 +80,7 @@ const Products = () => {
   if (loading) {
     return (
       <div className="products-page">
-        <h2><Loading /></h2>
+        <Loading />
       </div>
     );
   }
@@ -81,7 +88,7 @@ const Products = () => {
   if (error) {
     return (
       <div className="products-page">
-        <h2>{error}</h2>
+        <ErrorMessage message={error} />
       </div>
     );
   }
@@ -97,7 +104,7 @@ const Products = () => {
   };
 
   const redirect = () => {
-    {navigate("/products/create")};
+    navigate("/products/create");
   }
 
   const handleDelete = async (id:string) => {
@@ -113,7 +120,7 @@ const Products = () => {
         );
     } catch (error) {
         console.error("Failed to delete product:", error);
-        alert("Failed to delete product.");
+        setDeleteError("Failed to delete product.");
     }
   };
 
@@ -122,11 +129,14 @@ const Products = () => {
       <div className="products-page__header">
         <div>
           <h1>Products</h1>
-          <p>Manage you inventory products.</p>
+          <p>Manage your inventory products.</p>
         </div>
-        <button onClick={redirect} className="add-product"><PlusCircle size={18} />Add Product</button>
+        {canCreate && (<button onClick={redirect} className="add-product"><PlusCircle size={18} />Add Product</button>)}
       </div>
       <div className="products-card">
+        {deleteError && (
+          <ErrorMessage message={deleteError} />
+        )}
         <div className="products-filters">
           <div className="searchbar">
             <Search size={16} />
@@ -229,8 +239,8 @@ const Products = () => {
                   <td>{product.minStock}</td>
                   <td>{getStockStatus(product.quantity, product.minStock)}</td>
                   <td>
-                    <button type="button"><Edit size={18} color="blue" onClick={() => navigate(`/products/${product.id}/edit`)} /></button>
-                    <button type="button"><Trash size={18} color="red" onClick={() => handleDelete(product.id)} /></button>
+                    {canEdit && (<button type="button"><Edit size={18} color="blue" onClick={() => navigate(`/products/${product.id}/edit`)} /></button>)}
+                    {canDelete && (<button type="button"><Trash size={18} color="red" onClick={() => handleDelete(product.id)} /></button>)}
                   </td>
                 </tr>
               ))}

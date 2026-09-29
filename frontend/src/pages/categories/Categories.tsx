@@ -3,6 +3,8 @@ import { deleteCategory, getCategories, type Category } from "../../services/cat
 import { Edit, PlusCircle, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
+import { useAuth } from "../../context/AuthContext";
+import ErrorMessage from "../../components/common/ErrorMessage";
 
 
 const Categories = () => {
@@ -11,6 +13,12 @@ const Categories = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [deleteError, setDeleteError] = useState("");
+    const { user } = useAuth();
+
+    const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
+    const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
+    const canDelete = user?.role === "ADMIN";
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -30,11 +38,19 @@ const Categories = () => {
     }, []);
 
     if(loading) {
-        return <div><Loading /></div>;
+        return (
+        <div className="categories-page">
+            <Loading />
+        </div>
+    );
     }
 
     if(error) {
-        return <div>{error}</div>
+        return (
+        <div className="categories-page">
+            <ErrorMessage message={error} />
+        </div>
+    );
     }
 
     const handleDelete = async (id: string) => {
@@ -48,7 +64,7 @@ const Categories = () => {
             setCategories((currentCategories) => currentCategories.filter((category) => category.id !== id));
         } catch (error) {
             console.error("Failed to delete category:", error);
-            alert("Failed to delete category. It may be used by existing products.");
+            setDeleteError("Failed to delete category. It may be used by existing products.");
         }
     };
 
@@ -59,10 +75,13 @@ const Categories = () => {
                 <h1>Categories</h1>
                 <p>Manage your product categories.</p>
             </div>
-            <button type="button" onClick={() => navigate("/categories/create")}><PlusCircle size={18}/> Add Category</button>
+            {canCreate && (<button type="button" onClick={() => navigate("/categories/create")}><PlusCircle size={18}/> Add Category</button>)}
         </div>
 
         <div className="categories-card">
+            {deleteError && (
+                <ErrorMessage message={deleteError} />
+            )}
             <div className="categories-table">
                 <thead>
                     <tr>
@@ -79,8 +98,8 @@ const Categories = () => {
                                 {new Date(category.createdAt).toLocaleDateString()}
                             </td>
                             <td>
-                                <button type="button" onClick={() => navigate(`/categories/${category.id}/edit`)} ><Edit size={18} color="blue"/></button>
-                                <button type="button" onClick={() => handleDelete(category.id)}><Trash size={18} color="red"/></button>
+                                {canEdit && (<button type="button" onClick={() => navigate(`/categories/${category.id}/edit`)} ><Edit size={18} color="blue"/></button>)}
+                                {canDelete && (<button type="button" onClick={() => handleDelete(category.id)}><Trash size={18} color="red"/></button>)}
                             </td>
                         </tr>
                     ))}

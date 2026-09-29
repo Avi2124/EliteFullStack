@@ -6,7 +6,7 @@ import userController from "../controllers/userController.js";
 
 const userRoutes = Router();
 userRoutes.use(authMiddleware);
-userRoutes.use(authorize(Role.ADMIN));
+userRoutes.use(authorize(Role.ADMIN, Role.MANAGER));
 userRoutes.get("/get-all", userController.findAll);
 userRoutes.get("/:id", userController.findById);
 userRoutes.post("/create", userController.create);

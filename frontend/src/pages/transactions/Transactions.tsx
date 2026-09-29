@@ -2,6 +2,9 @@ import { useEffect, useState, type FormEvent } from "react";
 import { getInventoryTransactions, createInventoryTransaction, type InventoryTransaction, type InventoryTransactionType } from "../../services/inventoryTransactionService";
 import { getProducts, type Product } from "../../services/productService";
 import Loading from "../../components/common/Loading";
+import { useAuth } from "../../context/AuthContext";
+import { PlusCircle } from "lucide-react";
+import ErrorMessage from "../../components/common/ErrorMessage";
 function Transactions() {
     const [transactions, setTransactions] = useState<InventoryTransaction[]>([]);
     const [page, setPage] = useState(1);
@@ -18,6 +21,10 @@ function Transactions() {
     const [transactionRemarks, setTransactionRemarks] = useState("");
     const [transactionLoading, setTransactionLoading] = useState(false);
     const [transactionError, setTransactionError] = useState("");
+
+    const { user } = useAuth();
+
+    const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
 
     useEffect(() => {
     const loadTransactions = async () => {
@@ -125,7 +132,7 @@ function Transactions() {
         return (
             <div className="transactions-page">
                 <div className="transactions-card">
-                    {error}
+                    <ErrorMessage message={error} />
                 </div>
             </div>
         );
@@ -145,13 +152,13 @@ function Transactions() {
                     </p>
                 </div>
 
-                <button
+                {canCreate && (<button
                     type="button"
                     className="btn btn-primary myBtn"
                     onClick={handleOpenModal}
                 >
-                    + Create Transaction
-                </button>
+                    <PlusCircle />Create Transaction
+                </button>)}
             </div>
 
             {/* Transactions Card */}
@@ -306,7 +313,7 @@ function Transactions() {
             </div>
 
             {/* Create Transaction Modal */}
-            {isModalOpen && (
+            {isModalOpen && canCreate && (
                 <div
                     className="transaction-modal"
                     onMouseDown={(event) => {
@@ -487,11 +494,7 @@ function Transactions() {
 
                             {/* Error */}
                             {transactionError && (
-                                <div className="inventory-message inventory-message--error">
-                                    {
-                                        transactionError
-                                    }
-                                </div>
+                                <ErrorMessage message={transactionError} />
                             )}
 
                             {/* Actions */}

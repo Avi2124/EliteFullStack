@@ -1,11 +1,35 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-const ProtectedRoute = () => {
-    const token = localStorage.getItem("accessToken");
-    if(!token) {
-        return <Navigate to="/login" replace />;
-    }
-  return <Outlet />;
+import Loading from "../components/common/Loading";
+import { useAuth } from "../context/AuthContext";
+import type { User } from "../services/authService";
+
+interface ProtectedRouteProps {
+    allowedRoles?: User["role"][];
 }
 
-export default ProtectedRoute
+const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+    const token = localStorage.getItem("accessToken");
+
+    const { user, loading } = useAuth();
+
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (loading) {
+        return <Loading />;
+    }
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return <Outlet />;
+};
+
+export default ProtectedRoute;

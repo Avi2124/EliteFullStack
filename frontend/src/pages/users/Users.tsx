@@ -10,6 +10,7 @@ import {
   updateUserStatus,
 } from "../../services/userService";
 import Loading from "../../components/common/Loading";
+import { useAuth } from "../../context/AuthContext";
 
 const Users = () => {
   const navigate = useNavigate();
@@ -24,6 +25,13 @@ const Users = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
   const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "">("");
+
+  const { user } = useAuth();
+
+  const canManageUsers = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canCreate = canManageUsers;
+  const canEdit = canManageUsers;
+  const canDelete = user?.role === "ADMIN";
 
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm(
@@ -45,13 +53,13 @@ const Users = () => {
     }
   };
 
-    useEffect(() => {
-  const timer = setTimeout(() => {
-    setDebouncedSearch(search);
-  }, 500);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
 
-  return () => clearTimeout(timer);
-}, [search]);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -59,7 +67,13 @@ const Users = () => {
         setLoading(true);
         setError("");
 
-        const data = await getUsers(page, limit, debouncedSearch, role, status === "ACTIVE" ? "true" : status === "INACTIVE" ? "false" : "");
+        const data = await getUsers(
+          page,
+          limit,
+          debouncedSearch,
+          role,
+          status === "ACTIVE" ? "true" : status === "INACTIVE" ? "false" : "",
+        );
 
         setUsers(data.users);
         setTotalPages(data.pagination.totalPages);
@@ -73,7 +87,7 @@ const Users = () => {
     };
 
     fetchUsers();
-  }, [page, limit, debouncedSearch, role,status]);
+  }, [page, limit, debouncedSearch, role, status]);
 
   const handleStatusChange = async (id: string, currentStatus: boolean) => {
     try {
@@ -102,9 +116,11 @@ const Users = () => {
           <p>Manage system users and their roles.</p>
         </div>
 
-        <button type="button" onClick={() => navigate("/users/create")}>
-          Add User
-        </button>
+        {canCreate && (
+          <button type="button" onClick={() => navigate("/users/create")}>
+            Add User
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -113,12 +129,18 @@ const Users = () => {
           type="text"
           placeholder="Search users..."
           value={search}
-          onChange={(event) => {setSearch(event.target.value); setPage(1)}}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setPage(1);
+          }}
         />
 
         <select
           value={role}
-          onChange={(event) => {setRole(event.target.value as UserRole | ""); setPage(1)}}
+          onChange={(event) => {
+            setRole(event.target.value as UserRole | "");
+            setPage(1);
+          }}
         >
           <option value="">All Roles</option>
 
@@ -131,10 +153,10 @@ const Users = () => {
 
         <select
           value={status}
-          onChange={(event) =>{
+          onChange={(event) => {
             setStatus(event.target.value as "ACTIVE" | "INACTIVE" | "");
-            setPage(1)}
-          }
+            setPage(1);
+          }}
         >
           <option value="">All Status</option>
 
@@ -160,8 +182,12 @@ const Users = () => {
 
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="users-table__loading"><Loading /></td></tr>
-                    ): users.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="users-table__loading">
+                    <Loading />
+                  </td>
+                </tr>
+              ) : users.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
@@ -182,12 +208,24 @@ const Users = () => {
                     <td>{user.role}</td>
 
                     <td>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleStatusChange(user.id, user.isActive)
-                        }
-                      >
+                      {canManageUsers ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleStatusChange(user.id, user.isActive)
+                          }
+                        >
+                          <span
+                            className={`user-status ${
+                              user.isActive
+                                ? "user-status--active"
+                                : "user-status--inactive"
+                            }`}
+                          >
+                            {user.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </button>
+                      ) : (
                         <span
                           className={`user-status ${
                             user.isActive
@@ -197,23 +235,27 @@ const Users = () => {
                         >
                           {user.isActive ? "Active" : "Inactive"}
                         </span>
-                      </button>
+                      )}
                     </td>
 
                     <td>
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/users/${user.id}/edit`)}
-                      >
-                        <Edit size={18} color="blue" />
-                      </button>
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/users/${user.id}/edit`)}
+                        >
+                          <Edit size={18} color="blue" />
+                        </button>
+                      )}
 
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(user.id)}
-                      >
-                        <Trash size={18} color="red" />
-                      </button>
+                      {canDelete && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(user.id)}
+                        >
+                          <Trash size={18} color="red" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -223,26 +265,26 @@ const Users = () => {
         </div>
       </div>
       <div className="users-pagination">
-            <button
-              type="button"
-              disabled={page === 1}
-              onClick={() => setPage((currentPage) => currentPage - 1)}
-            >
-              Previous
-            </button>
+        <button
+          type="button"
+          disabled={page === 1}
+          onClick={() => setPage((currentPage) => currentPage - 1)}
+        >
+          Previous
+        </button>
 
-            <span>
-              Page {page} of {totalPages}
-            </span>
+        <span>
+          Page {page} of {totalPages}
+        </span>
 
-            <button
-              type="button"
-              disabled={page === totalPages}
-              onClick={() => setPage((currentPage) => currentPage + 1)}
-            >
-              Next
-            </button>
-          </div>
+        <button
+          type="button"
+          disabled={page === totalPages}
+          onClick={() => setPage((currentPage) => currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
