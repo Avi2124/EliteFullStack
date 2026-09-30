@@ -145,7 +145,7 @@ const EditUser = () => {
                     {error && <ErrorMessage message={error} />}
 
                     <div className="product-form__actions">
-                        <button className="btn btn--primary"
+                        <button className="btn btn--danger"
                             type="button"
                             onClick={() => navigate("/users")}
                         >

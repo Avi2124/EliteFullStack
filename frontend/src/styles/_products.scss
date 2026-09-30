@@ -238,6 +238,12 @@
     }
 }
 
+.btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
 /* =========================
    PRODUCT FORM
 ========================= */
@@ -246,6 +252,7 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
+    padding-bottom: 24px;
 
     &__group {
         min-width: 0;

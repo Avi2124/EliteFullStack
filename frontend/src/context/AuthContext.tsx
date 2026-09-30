@@ -12,7 +12,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     loadUser: () => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,9 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         try {
             setLoading(true);
-
             const profile = await getProfile();
-
             setUser(profile);
         } catch (error) {
             console.error("Failed to load user:", error);
@@ -49,7 +47,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     useEffect(() => {
-        loadUser();
+        void Promise.resolve().then(loadUser);
     }, []);
 
     const logout = async () => {
@@ -77,6 +75,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
 

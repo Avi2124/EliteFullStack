@@ -93,3 +93,30 @@ export const updateProduct = async (id: string, data: CreateProductData): Promis
 export const deleteProduct = async (id: string): Promise<void> => {
     await api.delete(`/api/products/${id}`);
 };
+
+export const exportProducts = async (): Promise<Blob> => {
+    const res = await api.get(
+        "/api/products/export",
+        {
+            responseType: "blob",
+        }
+    );
+
+    return res.data;
+};
+
+export const importProducts = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await api.post("/api/products/import", formData);
+    return res.data.data;
+};
+
+export const downloadProductTemplate = async (): Promise<Blob> => {
+        const res = await api.get("/api/products/template", 
+            {
+                responseType: "blob",
+            }
+        );
+        return res.data;
+    };

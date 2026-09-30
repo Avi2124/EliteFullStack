@@ -1,8 +1,23 @@
 import { useEffect, useState } from "react";
-import { deleteProduct, getProducts, type Product } from "../../services/productService";
+import {
+  deleteProduct,
+  downloadProductTemplate,
+  exportProducts,
+  getProducts,
+  importProducts,
+  type Product,
+} from "../../services/productService";
 import { type Category, getCategories } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
-import { Edit, PlusCircle, Search, Trash } from "lucide-react";
+import {
+  Download,
+  Edit,
+  FileSpreadsheet,
+  PlusCircle,
+  Search,
+  Trash,
+  Upload,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
@@ -11,6 +26,7 @@ import { useAuth } from "../../context/AuthContext";
 const Products = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [, setRefresh] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
@@ -95,43 +111,97 @@ const Products = () => {
 
   const getStockStatus = (quantity: number, minStock: number) => {
     if (quantity === 0) {
-        return {
-            label: "Out of Stock",
-            className: "stock-status--out-of-stock",
-        };
+      return {
+        label: "Out of Stock",
+        className: "stock-status--out-of-stock",
+      };
     }
 
     if (quantity < minStock) {
-        return {
-            label: "Low Stock",
-            className: "stock-status--low-stock",
-        };
+      return {
+        label: "Low Stock",
+        className: "stock-status--low-stock",
+      };
     }
 
     return {
-        label: "In Stock",
-        className: "stock-status--in-stock",
+      label: "In Stock",
+      className: "stock-status--in-stock",
     };
-};
+  };
 
   const redirect = () => {
     navigate("/products/create");
-  }
+  };
 
-  const handleDelete = async (id:string) => {
-    const confirmed = window.confirm("Are you sure you want to delete this product?");
-    if(!confirmed) {
-        return;
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?",
+    );
+    if (!confirmed) {
+      return;
     }
 
     try {
-        await deleteProduct(id);
-        setProducts((currentProducts) => 
-            currentProducts.filter((product) => product.id !== id)
-        );
+      await deleteProduct(id);
+      setProducts((currentProducts) =>
+        currentProducts.filter((product) => product.id !== id),
+      );
     } catch (error) {
-        console.error("Failed to delete product:", error);
-        setDeleteError("Failed to delete product.");
+      console.error("Failed to delete product:", error);
+      setDeleteError("Failed to delete product.");
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await exportProducts();
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "products.xlsx";
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to export products:", error);
+    }
+  };
+
+  const handleTemplateDownload = async () => {
+    try {
+      const blob = await downloadProductTemplate();
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "product-template.xlsx";
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download product template:", error);
+    }
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      await importProducts(file);
+
+      setRefresh((current) => current + 1);
+    } catch (error) {
+      console.error("Failed to import products:", error);
+    } finally {
+      event.target.value = "";
     }
   };
 
@@ -142,18 +212,20 @@ const Products = () => {
           <h1>Products</h1>
           <p>Manage your inventory products.</p>
         </div>
-        {canCreate && (<button onClick={redirect} className="btn btn--primary"><PlusCircle size={18} />Add Product</button>)}
+        {canCreate && (
+          <button onClick={redirect} className="btn btn--primary">
+            <PlusCircle size={18} />
+            Add Product
+          </button>
+        )}
       </div>
       <div className="products-card">
-        {deleteError && (
-          <ErrorMessage message={deleteError} />
-        )}
+        {deleteError && <ErrorMessage message={deleteError} />}
         <div className="products-filters">
           <div className="searchbar">
             <Search size={16} />
             <input
               type="text"
-              
               placeholder="Search products..."
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -221,6 +293,42 @@ const Products = () => {
               <option value="asc">Ascending</option>
             </select>
           </div>
+          <div className="products-actions">
+            {user?.role === "ADMIN" && (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleExport}
+                >
+                  <Download size={17} />
+                  Export
+                </button>
+
+                <label className="btn btn-secondary">
+                  <Upload size={17} />
+                  Import
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleImport}
+                    hidden
+                  />
+                </label>
+              </>
+            )}
+
+            {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleTemplateDownload}
+              >
+                <FileSpreadsheet size={17} />
+                Template
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="products-table-wrapper">
@@ -249,22 +357,40 @@ const Products = () => {
                   <td>{product.quantity}</td>
                   <td>{product.minStock}</td>
                   <td>
-                      {(() => {
-                          const status = getStockStatus(
-                              product.quantity,
-                              product.minStock
-                          );
-                        
-                          return (
-                              <span className={`stock-status ${status.className}`}>
-                                  {status.label}
-                              </span>
-                          );
-                      })()}
+                    {(() => {
+                      const status = getStockStatus(
+                        product.quantity,
+                        product.minStock,
+                      );
+
+                      return (
+                        <span className={`stock-status ${status.className}`}>
+                          {status.label}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td>
-                    {canEdit && (<button type="button"><Edit size={18} color="blue" onClick={() => navigate(`/products/${product.id}/edit`)} /></button>)}
-                    {canDelete && (<button type="button"><Trash size={18} color="red" onClick={() => handleDelete(product.id)} /></button>)}
+                    {canEdit && (
+                      <button type="button">
+                        <Edit
+                          size={18}
+                          color="blue"
+                          onClick={() =>
+                            navigate(`/products/${product.id}/edit`)
+                          }
+                        />
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button type="button">
+                        <Trash
+                          size={18}
+                          color="red"
+                          onClick={() => handleDelete(product.id)}
+                        />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -273,31 +399,31 @@ const Products = () => {
         </div>
 
         <div className="users-pagination">
-        <button
-          type="button" className="btn btn--primary"
-          disabled={page === 1}
-          onClick={() => setPage((currentPage) => currentPage - 1)}
-        >
-          Previous
-        </button>
+          <button
+            type="button"
+            className="btn btn--primary"
+            disabled={page === 1}
+            onClick={() => setPage((currentPage) => currentPage - 1)}
+          >
+            Previous
+          </button>
 
-        <span>
-          Page {page} of {totalPages}
-        </span>
+          <span>
+            Page {page} of {totalPages}
+          </span>
 
-        <button
-          type="button" className="btn btn--primary"
-          disabled={page === totalPages}
-          onClick={() => setPage((currentPage) => currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
+          <button
+            type="button"
+            className="btn btn--primary"
+            disabled={page === totalPages}
+            onClick={() => setPage((currentPage) => currentPage + 1)}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-
-
 
 export default Products;

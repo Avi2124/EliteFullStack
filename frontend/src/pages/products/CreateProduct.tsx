@@ -66,7 +66,7 @@ const CreateProduct = () => {
                 <h1>Create Product</h1>
                 <p>Add a new product to your inventory.</p>
             </div>
-            <button type="button" className="btn btn--secondary" onClick={() => navigate("/products")}>Back to Products</button>
+            {/* <button type="button" className="btn btn--secondary" onClick={() => navigate("/products")}>Back to Products</button> */}
         </div>      
 
         <div className="products-card">
@@ -125,8 +125,12 @@ const CreateProduct = () => {
                         ))}
                     </select>
                 </div>
-                <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? "Creating..." : "Create Product"}</button>
             </form>
+<div className="btns">
+
+                <button type="submit" className="btn btn--danger" disabled={loading} onClick={() => navigate("/products")}>{loading ? "Canceling..." : "Cancel"}</button>
+                <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? "Creating..." : "Create Product"}</button>
+</div>
         </div>
     </div>
   );

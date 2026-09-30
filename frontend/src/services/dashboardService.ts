@@ -1,7 +1,6 @@
 import api from "./api";
 
 export interface DashboardData {
-    data: DashboardData | PromiseLike<DashboardData>;
     totalProducts: number;
     totalCategories: number;
     totalSuppliers: number;
@@ -17,7 +16,7 @@ export interface DashboardData {
 }
 
 export const getDashboard = async (): Promise<DashboardData> => {
-    const res = await api.get<DashboardData> (
+    const res = await api.get<{ data: DashboardData }>(
         `/api/dashboard`
     );
     return res.data.data;

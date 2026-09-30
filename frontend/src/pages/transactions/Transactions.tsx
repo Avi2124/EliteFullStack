@@ -164,7 +164,7 @@ function Transactions() {
             {/* Transactions Card */}
             <div className="transactions-card">
 
-                <div className="transactions-card__header">
+                {/* <div className="transactions-card__header">
                     <div>
                         <h2>Transactions</h2>
 
@@ -173,7 +173,7 @@ function Transactions() {
                             transaction history.
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Table */}
                 <div className="transactions-table-wrapper">
@@ -499,7 +499,7 @@ function Transactions() {
 
                                 <button
                                     type="button"
-                                    className="btn btn--primary"
+                                    className="btn btn--danger"
                                     onClick={
                                         handleCloseModal
                                     }

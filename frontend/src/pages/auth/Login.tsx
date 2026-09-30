@@ -24,6 +24,8 @@ function Login() {
             navigate("/dashboard");
         } catch {
             setError("Invalid Email or Password");
+        } finally {
+            setLoading(false);
         }
         // console.log({email, password});
     };
