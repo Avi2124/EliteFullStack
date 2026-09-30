@@ -1,4 +1,4 @@
-import { AlertTriangle, LockKeyhole, Mail, Package } from "lucide-react";
+import { AlertTriangle, Eye, EyeOff, LockKeyhole, Mail, Package } from "lucide-react";
 import { useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authService";
@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const { loadUser } = useAuth();
@@ -88,7 +89,9 @@ function Login() {
                                 <label htmlFor="password">Password</label>
                                 <div className="login-input">
                                     <LockKeyhole size={16} />
-                                    <input type="password" id="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" required />
+                                    <input type={showPassword ? "text" : "password"} id="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" required />
+                                    <button type="button" className="login-password-toggle" onClick={() => setShowPassword((prev) => !prev)}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? (<EyeOff size={16} />) : <Eye size={16} />}</button>
                                 </div>
                                 {error && (
                                 <div className="login-error">

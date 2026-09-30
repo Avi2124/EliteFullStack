@@ -1,25 +1,36 @@
+@use "variables" as vars;
+
 .email-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
     padding: 24px;
+    box-sizing: border-box;
 }
 
 .email-page__header {
     margin-bottom: 24px;
 
     h1 {
-        margin-bottom: 6px;
+        margin: 0 0 6px;
+        font-size: 24px;
+        font-weight: 600;
+        color: vars.$color-text;
     }
 
     p {
         margin: 0;
-        color: #6b7280;
+        font-size: 14px;
+        color: vars.$color-text-muted;
     }
 }
 
 .email-message {
     padding: 12px 16px;
     margin-bottom: 20px;
-    border-radius: 8px;
+    border-radius: vars.$radius-md;
     font-size: 14px;
+    line-height: 1.5;
 
     &--success {
         background: #ecfdf5;
@@ -36,7 +47,7 @@
 
 .email-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
 }
 
@@ -47,49 +58,146 @@
 
     min-height: 220px;
     padding: 24px;
+    box-sizing: border-box;
 
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    background: vars.$color-white;
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-md;
 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
     &__content {
         h2 {
-            margin-bottom: 12px;
-            font-size: 20px;
+            margin: 0 0 12px;
+            font-size: 19px;
+            font-weight: 600;
+            color: vars.$color-text;
+            line-height: 1.4;
         }
 
         p {
             margin: 0;
-            color: #6b7280;
+            color: vars.$color-text-muted;
             line-height: 1.6;
             font-size: 14px;
         }
     }
 
     button {
-        margin-top: 24px;
         width: 100%;
+        margin-top: 24px;
     }
 }
 
+/* Tablet */
 @media (max-width: 1000px) {
+    .email-page {
+        padding: 20px;
+    }
+
     .email-cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .email-card {
+        padding: 20px;
     }
 }
 
+/* Mobile */
 @media (max-width: 600px) {
     .email-page {
         padding: 16px;
     }
 
+    .email-page__header {
+        margin-bottom: 20px;
+
+        h1 {
+            font-size: 21px;
+        }
+
+        p {
+            font-size: 13px;
+        }
+    }
+
+    .email-message {
+        padding: 11px 13px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+
     .email-cards {
         grid-template-columns: 1fr;
+        gap: 14px;
     }
 
     .email-card {
         min-height: auto;
+        padding: 18px;
+
+        &__content {
+            h2 {
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 13px;
+            }
+        }
+
+        button {
+            margin-top: 20px;
+        }
+    }
+}
+
+/* Small mobile */
+@media (max-width: 400px) {
+    .email-page {
+        padding: 12px;
+    }
+
+    .email-page__header {
+        margin-bottom: 16px;
+
+        h1 {
+            font-size: 20px;
+        }
+
+        p {
+            font-size: 12px;
+        }
+    }
+
+    .email-message {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .email-cards {
+        gap: 12px;
+    }
+
+    .email-card {
+        padding: 16px;
+
+        &__content {
+            h2 {
+                font-size: 17px;
+                margin-bottom: 10px;
+            }
+
+            p {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+        }
+
+        button {
+            margin-top: 18px;
+        }
     }
 }

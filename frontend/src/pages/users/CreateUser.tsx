@@ -1,9 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
+
 import {
     createUser,
     type UserRole,
 } from "../../services/userService";
+
 import ErrorMessage from "../../components/common/ErrorMessage";
 
 const CreateUser = () => {
@@ -12,6 +15,7 @@ const CreateUser = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState<UserRole>("STAFF");
 
     const [loading, setLoading] = useState(false);
@@ -56,7 +60,6 @@ const CreateUser = () => {
 
             <div className="products-card">
                 <form className="product-form" onSubmit={handleSubmit}>
-
                     <div className="product-form__group">
                         <label htmlFor="name">Name</label>
 
@@ -84,13 +87,36 @@ const CreateUser = () => {
                     <div className="product-form__group">
                         <label htmlFor="password">Password</label>
 
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(event) => setPassword(event.target.value)}
-                            placeholder="Enter password"
-                        />
+                        <div className="product-form__password">
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
+                                placeholder="Enter password"
+                            />
+
+                            <button
+                                type="button"
+                                className="product-form__password-toggle"
+                                onClick={() =>
+                                    setShowPassword((prev) => !prev)
+                                }
+                                aria-label={
+                                    showPassword
+                                        ? "Hide password"
+                                        : "Show password"
+                                }
+                            >
+                                {showPassword ? (
+                                    <EyeOff size={17} />
+                                ) : (
+                                    <Eye size={17} />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="product-form__group">
@@ -112,18 +138,22 @@ const CreateUser = () => {
                     {error && <ErrorMessage message={error} />}
 
                     <div className="product-form__actions">
-                        <button className="btn btn--primary"
+                        <button
+                            className="btn btn--primary"
                             type="button"
                             onClick={() => navigate("/users")}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" className="btn btn--primary" disabled={loading}>
+                        <button
+                            type="submit"
+                            className="btn btn--primary"
+                            disabled={loading}
+                        >
                             {loading ? "Creating..." : "Create User"}
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>

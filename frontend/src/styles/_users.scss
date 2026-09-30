@@ -293,6 +293,56 @@
     }
 }
 
+/* PASSWORD FIELD */
+
+.product-form__password {
+    position: relative;
+    width: 100%;
+
+    input {
+        width: 100%;
+        box-sizing: border-box;
+        padding-right: 44px;
+    }
+}
+
+.product-form__password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    margin: 0;
+    padding: 0;
+
+    transform: translateY(-50%);
+
+    border: 0;
+    border-radius: 6px;
+
+    background: transparent;
+    color: vars.$color-text-muted;
+
+    cursor: pointer;
+
+    &:hover {
+        background: #f3f4f6;
+        color: vars.$color-text;
+    }
+
+    &:focus-visible {
+        outline: 2px solid vars.$color-primary;
+        outline-offset: 1px;
+    }
+}
+
+
 /* TABLET */
 
 @media (max-width: 1000px) {
