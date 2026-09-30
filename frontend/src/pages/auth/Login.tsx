@@ -1,6 +1,6 @@
 import { AlertTriangle, Eye, EyeOff, LockKeyhole, Mail, Package } from "lucide-react";
 import { useState, type FormEvent } from "react"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 
@@ -92,6 +92,11 @@ function Login() {
                                     <input type={showPassword ? "text" : "password"} id="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" required />
                                     <button type="button" className="login-password-toggle" onClick={() => setShowPassword((prev) => !prev)}
                                         aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? (<EyeOff size={16} />) : <Eye size={16} />}</button>
+                                </div>
+                                <div className="login-form__forgot">
+                                    <Link to="/forgot-password">
+                                        Forgot Password?
+                                    </Link>
                                 </div>
                                 {error && (
                                 <div className="login-error">

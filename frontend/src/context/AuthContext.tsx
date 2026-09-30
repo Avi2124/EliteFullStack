@@ -6,9 +6,9 @@ import {
     type ReactNode,
 } from "react";
 
-import { getProfile, type User } from "../services/authService";
+import { getProfile, logoutUser, type User } from "../services/authService";
 
-interface AuthContextType {
+interface AuthContextType { 
     user: User | null;
     loading: boolean;
     loadUser: () => Promise<void>;
@@ -52,9 +52,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         loadUser();
     }, []);
 
-    const logout = () => {
-        localStorage.removeItem("accessToken");
-        setUser(null);
+    const logout = async () => {
+        try {
+            await logoutUser();
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            localStorage.removeItem("accessToken");
+            setUser(null);
+        }
     };
 
     return (

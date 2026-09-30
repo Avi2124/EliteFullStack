@@ -19,11 +19,15 @@ import CreateUser from "../pages/users/CreateUser"
 import EditUser from "../pages/users/EditUser"
 import AuditLogs from "../pages/auditLogs/AuditLogs"
 import Email from "../pages/email/Email"
+import ForgotPassword from "../pages/auth/ForgotPassword"
+import ResetPassword from "../pages/auth/ResetPassword"
 
 const AppRoutes = () => {
   return (  
         <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route element={<ProtectedRoute />} >
                 <Route element={<DashboardLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
@@ -60,6 +64,7 @@ const AppRoutes = () => {
                     <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
                         <Route path="/email" element={<Email />} />
                     </Route>
+                    
                 </Route>
             </Route>
             

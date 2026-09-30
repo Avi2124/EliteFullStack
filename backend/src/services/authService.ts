@@ -1,4 +1,5 @@
 import authRepository from "../repositories/authRepository.js";
+import crypto from "crypto";
 
 import AppError from "../utils/AppError.js";
 
@@ -9,6 +10,7 @@ import {
 } from "../utils/jwt.js";
 
 import { comparePassword, hashPassword } from "../utils/password.js";
+import emailService from "./emailService.js";
 
 class AuthService {
   async register(name: string, email: string, password: string) {
@@ -160,6 +162,60 @@ class AuthService {
       name: user.name,
       email: user.email,
       role: user.role,
+    };
+  }
+
+  async forgotPassword({ email }: { email: string }) {
+    const user = await authRepository.findUserByEmail(email);
+
+    if (!user) {
+      return {
+        message:
+          "If an account exists with this email, a reset link has been sent.",
+      };
+    }
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await authRepository.setResetPasswordToken(user.id, hashedToken, expiresAt);
+
+    await emailService.sendResetPasswordEmail(user.email, user.name, rawToken);
+
+    return {
+      message:
+        "If an account exists with this email, a reset link has been sent.", 
+        // token: rawToken
+    };
+  }
+
+  async resetPassword({
+    token,
+    newPassword,
+  }: {
+    token: string;
+    newPassword: string;
+  }) {
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await authRepository.findUserByResetToken(hashedToken);
+
+    if (!user) {
+      throw new AppError("Invalid or expired reset token", 400);
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await authRepository.resetPassword(user.id, hashedPassword);
+
+    return {
+      message: "Password reset successful. Please login again.",
     };
   }
 }
