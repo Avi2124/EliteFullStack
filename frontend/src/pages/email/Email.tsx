@@ -74,7 +74,7 @@ const Email = () => {
                     </div>
 
                     <button
-                        type="button"
+                        type="button" className="btn btn--primary"
                         onClick={() => handleSendEmail("daily")}
                         disabled={loading !== ""}
                     >
@@ -94,7 +94,7 @@ const Email = () => {
                     </div>
 
                     <button
-                        type="button"
+                        type="button" className="btn btn--primary"
                         onClick={() => handleSendEmail("low-stock")}
                         disabled={loading !== ""}
                     >
@@ -114,7 +114,7 @@ const Email = () => {
                     </div>
 
                     <button
-                        type="button"
+                        type="button" className="btn btn--primary"
                         onClick={() => handleSendEmail("weekly")}
                         disabled={loading !== ""}
                     >

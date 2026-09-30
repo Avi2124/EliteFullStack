@@ -122,7 +122,7 @@ const Users = () => {
         </div>
 
         {canCreate && (
-          <button type="button" onClick={() => navigate("/users/create")}>
+          <button type="button" className="btn btn--primary" onClick={() => navigate("/users/create")}>
             Add User
           </button>
         )}
@@ -197,9 +197,7 @@ const Users = () => {
                 <tr>
                   <td
                     colSpan={5}
-                    style={{
-                      textAlign: "center",
-                    }}
+                    className="users-table__empty"
                   >
                     No users found.
                   </td>
@@ -272,7 +270,7 @@ const Users = () => {
       </div>
       <div className="users-pagination">
         <button
-          type="button"
+          type="button" className="btn btn--primary"
           disabled={page === 1}
           onClick={() => setPage((currentPage) => currentPage - 1)}
         >
@@ -284,7 +282,7 @@ const Users = () => {
         </span>
 
         <button
-          type="button"
+          type="button" className="btn btn--primary"
           disabled={page === totalPages}
           onClick={() => setPage((currentPage) => currentPage + 1)}
         >

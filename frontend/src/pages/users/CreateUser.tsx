@@ -112,14 +112,14 @@ const CreateUser = () => {
                     {error && <ErrorMessage message={error} />}
 
                     <div className="product-form__actions">
-                        <button
+                        <button className="btn btn--primary"
                             type="button"
                             onClick={() => navigate("/users")}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" disabled={loading}>
+                        <button type="submit" className="btn btn--primary" disabled={loading}>
                             {loading ? "Creating..." : "Create User"}
                         </button>
                     </div>

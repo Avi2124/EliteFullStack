@@ -154,7 +154,7 @@ function Transactions() {
 
                 {canCreate && (<button
                     type="button"
-                    className="btn btn-primary myBtn"
+                    className="btn btn--primary"
                     onClick={handleOpenModal}
                 >
                     <PlusCircle />Create Transaction
@@ -499,7 +499,7 @@ function Transactions() {
 
                                 <button
                                     type="button"
-                                    className="btn btn-secondary"
+                                    className="btn btn--primary"
                                     onClick={
                                         handleCloseModal
                                     }
@@ -512,7 +512,7 @@ function Transactions() {
 
                                 <button
                                     type="submit"
-                                    className="btn btn-primary"
+                                    className="btn btn--primary"
                                     disabled={
                                         transactionLoading
                                     }

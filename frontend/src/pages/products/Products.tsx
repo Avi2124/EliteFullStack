@@ -142,7 +142,7 @@ const Products = () => {
           <h1>Products</h1>
           <p>Manage your inventory products.</p>
         </div>
-        {canCreate && (<button onClick={redirect} className="add-product"><PlusCircle size={18} />Add Product</button>)}
+        {canCreate && (<button onClick={redirect} className="btn btn--primary"><PlusCircle size={18} />Add Product</button>)}
       </div>
       <div className="products-card">
         {deleteError && (
@@ -272,28 +272,32 @@ const Products = () => {
           </table>
         </div>
 
-        <div className="products-pagination">
-          <button
-            type="button"
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-          >
-            Previous
-          </button>
-          <span>
-            Page {page} of {totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={page === totalPages}
-            onClick={() => setPage(page + 1)}
-          >
-            Next
-          </button>
-        </div>
+        <div className="users-pagination">
+        <button
+          type="button" className="btn btn--primary"
+          disabled={page === 1}
+          onClick={() => setPage((currentPage) => currentPage - 1)}
+        >
+          Previous
+        </button>
+
+        <span>
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          type="button" className="btn btn--primary"
+          disabled={page === totalPages}
+          onClick={() => setPage((currentPage) => currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
       </div>
     </div>
   );
 };
+
+
 
 export default Products;

@@ -152,8 +152,8 @@ const EditProduct = () => {
                 </div>
 
                 <div className="product-form__actions">
-                    <button type="button" onClick={() => navigate("/products")}>Cancel</button>
-                    <button type="submit" disabled={saving}>{saving ? "Updating..." : "Update Product"}</button>
+                    <button type="button" className="btn btn--danger" onClick={() => navigate("/products")}>Cancel</button>
+                    <button type="submit" className="btn btn--primary" disabled={saving}>{saving ? "Updating..." : "Update Product"}</button>
                 </div>
 
             </form>

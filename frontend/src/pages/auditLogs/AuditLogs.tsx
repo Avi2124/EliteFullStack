@@ -129,11 +129,27 @@ const AuditLogs = () => {
                 </table>
             </div>
 
-            <div className="audit-logs-pagination">
-                    <button type="button" disabled={page === 1} onClick={() => setPage((currentPage) => currentPage - 1)}>Previous</button>
-                    <span>Page {page} of {" "} {totalPages}</span>
-                    <button type="button" disabled={page === totalPages} onClick={() => setPage((currentPage) => currentPage + 1)}>Next</button>
-            </div>
+            <div className="users-pagination">
+        <button
+          type="button" className="btn btn--primary"
+          disabled={page === 1}
+          onClick={() => setPage((currentPage) => currentPage - 1)}
+        >
+          Previous
+        </button>
+
+        <span>
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          type="button" className="btn btn--primary"
+          disabled={page === totalPages}
+          onClick={() => setPage((currentPage) => currentPage + 1)}
+        >
+          Next
+        </button>
+      </div>
         </div>
     </div>
   );

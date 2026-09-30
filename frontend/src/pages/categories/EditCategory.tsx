@@ -121,13 +121,13 @@ const EditCategory = () => {
 
                     <div className="product-form__actions">
                         <button
-                            type="button"
+                            type="button" className="btn btn--danger"
                             onClick={() => navigate("/categories")}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" disabled={saving}>
+                        <button type="submit" className="btn btn--primary" disabled={saving}>
                             {saving
                                 ? "Updating..."
                                 : "Update Category"}

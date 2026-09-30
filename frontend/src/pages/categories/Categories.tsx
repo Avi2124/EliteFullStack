@@ -75,7 +75,7 @@ const Categories = () => {
                 <h1>Categories</h1>
                 <p>Manage your product categories.</p>
             </div>
-            {canCreate && (<button type="button" onClick={() => navigate("/categories/create")}><PlusCircle size={18}/> Add Category</button>)}
+            {canCreate && (<button type="button" className="btn btn--primary" onClick={() => navigate("/categories/create")}><PlusCircle size={18}/> Add Category</button>)}
         </div>
 
         <div className="categories-card">
