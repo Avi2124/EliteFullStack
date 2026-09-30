@@ -9,12 +9,14 @@ function Login() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { loadUser } = useAuth();
 
     const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError("");
+        setLoading(true);
         try {
             const res = await loginUser({email, password});
             localStorage.setItem("accessToken", res);
@@ -104,7 +106,7 @@ function Login() {
                                 </div>
                             )}
                             </div>
-                            <button type="submit" className="btn btn--primary login-button">Sign In</button>
+                            <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? "Signing In..." : "Sign In"}</button>
                         </form>
                     </div>
                 </section>

@@ -89,7 +89,7 @@ const ForgotPassword = () => {
 
                     <button
                         type="submit"
-                        className="btn btn-primary auth-form__button"
+                        className="btn btn--primary"
                         disabled={loading}
                     >
                         {loading
