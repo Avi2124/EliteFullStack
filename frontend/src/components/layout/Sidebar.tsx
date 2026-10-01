@@ -57,7 +57,7 @@ function Sidebar ({isOpen, onClose}: SidebarProps) {
         <aside className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
             <div className="sidebar__brand">
                 <div className="sidebar__logo">
-                    <img src="logo2.png" alt="logo" />
+                    <img src="/logo2.png" alt="logo" />
                 </div>
                 <button type="button" className="sidebar__close" onClick={onClose} aria-label="Close Sidebar"><X size={18} /></button>
             </div>

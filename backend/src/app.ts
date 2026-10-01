@@ -25,6 +25,7 @@ app.use(helmet());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://elite-inventory-system-1.onrender.com",
+  "https://elitefullstack-frontend.onrender.com"
 ];
 app.use(
   cors({
