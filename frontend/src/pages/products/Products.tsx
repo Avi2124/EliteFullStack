@@ -298,14 +298,14 @@ const Products = () => {
               <>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn--primary"
                   onClick={handleExport}
                 >
                   <Download size={17} />
                   Export
                 </button>
 
-                <label className="btn btn-secondary">
+                <label className="btn btn--primary">
                   <Upload size={17} />
                   Import
                   <input
@@ -321,7 +321,7 @@ const Products = () => {
             {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn--primary"
                 onClick={handleTemplateDownload}
               >
                 <FileSpreadsheet size={17} />
@@ -343,7 +343,7 @@ const Products = () => {
                 <th>Quantity</th>
                 <th>Min Stock</th>
                 <th>Status</th>
-                <th>Actions</th>
+                {user?.role === "ADMIN" && "MANAGER" && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -370,6 +370,7 @@ const Products = () => {
                       );
                     })()}
                   </td>
+                  {user?.role === "ADMIN" && "MANAGER" && <>
                   <td>
                     {canEdit && (
                       <button type="button">
@@ -392,6 +393,8 @@ const Products = () => {
                       </button>
                     )}
                   </td>
+                  </>}
+                  
                 </tr>
               ))}
             </tbody>

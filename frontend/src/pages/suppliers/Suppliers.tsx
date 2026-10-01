@@ -120,7 +120,7 @@ const Suppliers = () => {
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>Actions</th>
+                                {user?.role === "ADMIN" && "MANAGER" && <th>Actions</th>}
                             </tr>
                         </thead>
 
@@ -130,8 +130,8 @@ const Suppliers = () => {
                                     <td>{supplier.name}</td>
                                     <td>{supplier.email}</td>
                                     <td>{supplier.phone}</td>
-
-                                    <td>
+                                    {user?.role === "ADMIN" && "MANAGER" && <>
+                                        <td>
                                         {canEdit && (
                                             <button
                                                 type="button"
@@ -158,6 +158,7 @@ const Suppliers = () => {
                                             </button>
                                         )}
                                     </td>
+                                    </>}
                                 </tr>
                             ))}
                         </tbody>

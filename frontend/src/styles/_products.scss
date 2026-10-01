@@ -41,13 +41,20 @@
     box-shadow: vars.$shadow-sm;
 }
 
+.products-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
 /* =========================
    SEARCH / FILTERS
 ========================= */
 
 .products-filters {
     display: grid;
-    grid-template-columns: minmax(220px, 1.4fr) 2fr;
+    grid-template-columns: minmax(220px, 1fr);
     gap: 10px;
     margin-bottom: 20px;
 }

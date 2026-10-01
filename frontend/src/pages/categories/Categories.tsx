@@ -87,7 +87,7 @@ const Categories = () => {
                     <tr>
                         <th>Name</th>
                         <th>Created At</th>
-                        <th>Actions</th>
+                        {user?.role === "ADMIN" && "MANAGER" && <th>Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -97,10 +97,11 @@ const Categories = () => {
                             <td>
                                 {new Date(category.createdAt).toLocaleDateString()}
                             </td>
-                            <td>
+                            {user?.role === "ADMIN" && "MANAGER" &&  <td>
                                 {canEdit && (<button type="button" onClick={() => navigate(`/categories/${category.id}/edit`)} ><Edit size={18} color="blue"/></button>)}
                                 {canDelete && (<button type="button" onClick={() => handleDelete(category.id)}><Trash size={18} color="red"/></button>)}
-                            </td>
+                            </td>}
+                           
                         </tr>
                     ))}
                 </tbody>

@@ -1,4 +1,4 @@
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { Bell, LogOut, Menu } from "lucide-react";
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 
 function DashboardLayout () {
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    
         const navigate = useNavigate();
         const { user } = useAuth();
 
@@ -21,9 +22,9 @@ const handleLogout = () => {
                     <div className="topbar__left">
                         <button type="button" className="topbar__menu"
                         onClick={() => setSidebarOpen(true)} aria-label="Open menu"><Menu size={20} /></button>
-                        <div className="topbar__search"><Search size={16} />
-                            <input type="text" placeholder="Search products, categories, suppliers..." />
-                        </div>
+                        {/* <div className="topbar__search"><Search size={16} />
+                            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search products, categories, suppliers..." />
+                        </div> */}
                     </div>
                     <div className="topbar__right">
                         <button type="button" className="topbar__notification" aria-label="Notifications"><Bell size={18} />
