@@ -113,7 +113,7 @@ function Dashboard() {
                     <h1>Dashboard</h1>
 
                     <p>
-                        {getGreeting()}, {user?.name} 👋
+                        {getGreeting()}, {user?.name.split(" ")[0]} 👋
                     </p>
 
                     <span className="dashboard-header__description">
