@@ -12,49 +12,26 @@ import {
     Warehouse,
     XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-import { getDashboard, type DashboardData } from "../../services/dashboardService";
-import { getInventoryTransactions } from "../../services/inventoryTransactionService";
-import { useAuth } from "../../context/AuthContext";
 
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-
-type RecentTransaction =
-    Awaited<ReturnType<typeof getInventoryTransactions>>["transactions"][number];
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchDashboard } from "../../store/slices/dashboardSlice";
 
 function Dashboard() {
     const navigate = useNavigate();
-    const { user } = useAuth();
-
-    const [dashboard, setDashboard] = useState<DashboardData | null>(null);
-    const [transactions, setTransactions] = useState<RecentTransaction[]>([]);
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.auth.user);
+    const dashboard = useAppSelector((state) => state.dashboard.dashboard);
+    const transactions = useAppSelector((state) => state.dashboard.transactions);
+    const loading = useAppSelector((state) => state.dashboard.loading);
+    const error = useAppSelector((state) => state.dashboard.error);
 
     useEffect(() => {
-        const fetchDashboard = async () => {
-            try {
-                const [dashboardData, transactionData] = await Promise.all([
-                    getDashboard(),
-                    getInventoryTransactions(1, 5),
-                ]);
-
-                setDashboard(dashboardData);
-                setTransactions(transactionData.transactions);
-            } catch (error) {
-                console.error("Failed to load dashboard:", error);
-                setError("Failed to load dashboard data");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDashboard();
-    }, []);
+        void dispatch(fetchDashboard());
+    }, [dispatch]);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -423,9 +400,9 @@ function Dashboard() {
                                             }`}
                                         >
                                             {isStockIn ? (
-                                                <ArrowUpRight size={17} />
-                                            ) : (
                                                 <ArrowDownRight size={17} />
+                                            ) : (
+                                                <ArrowUpRight size={17} />
                                             )}
                                         </div>
 

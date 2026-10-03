@@ -25,12 +25,14 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    // const [user, setUser] = useState<User | null>(null);
-    // const [loading, setLoading] = useState(true);
     
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.auth.user);
     const loading = useAppSelector((state) => state.auth.loading);
+    console.log("AUTH:", {
+    user,
+    loading,
+});
 
     const handleLoadUser = async () => {
         await dispatch(loadUser());

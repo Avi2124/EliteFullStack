@@ -11,18 +11,27 @@ function Login() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const authLoading = useAppSelector((state) => state.auth.loading);
+    const authLoading = useAppSelector((state) => state.auth.loginLoading);
     const isFormValid = email.trim() !== "" && password.trim() !== "";
 
     const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError("");
         try {
-           await dispatch(login({email, password})).unwrap();
-           navigate("/dashboard");
-        } catch {
-            setError("Invalid Email or Password");
-        }
+    const result = await dispatch(
+        login({
+            email,
+            password,
+        })
+    ).unwrap();
+
+    console.log("LOGIN SUCCESS:", result);
+
+    navigate("/dashboard");
+} catch (error) {
+    console.log("LOGIN ERROR:", error);
+    setError("Invalid Email or Password");
+}
     };
 
     return (
