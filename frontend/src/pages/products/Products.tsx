@@ -1,73 +1,42 @@
 import { useEffect, useState } from "react";
-import {
-  deleteProduct,
-  downloadProductTemplate,
-  exportProducts,
-  getProducts,
-  importProducts,
-  type Product,
-} from "../../services/productService";
 import { type Category, getCategories } from "../../services/categoryService";
 import { getSuppliers, type Supplier } from "../../services/supplierService";
-import {
-  Download,
-  Edit,
-  FileSpreadsheet,
-  PlusCircle,
-  Search,
-  Trash,
-  Upload,
-} from "lucide-react";
+import { Download, Edit, FileSpreadsheet, PlusCircle, Search, Trash, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-import { useAuth } from "../../context/AuthContext";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { downloadProductTemplateFile, exportProductFile, fetchProducts, importProductFile, removeProduct, setCategoryId,
+    setOrder, setPage, setSearchQuery, setSortBy, setSupplierId } from "../../store/slices/productSlice";
 
 const Products = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [, setRefresh] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
+  const {
+    products,
+    page,
+    totalPages,
+    searchQuery,
+    categoryId,
+    supplierId,
+    sortBy,
+    order,
+    loading,
+    error
+  } = useAppSelector((state) => state.product);
+  const [search, setSearch] = useState(searchQuery);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryId, setCategoryId] = useState("");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [supplierId, setSupplierId] = useState("");
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [order, setOrder] = useState("desc");
   const [deleteError, setDeleteError] = useState("");
-  const { user } = useAuth();
+
   const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
   const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
   const canDelete = user?.role === "ADMIN";
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts(
-          page,
-          10,
-          searchQuery,
-          categoryId,
-          supplierId,
-          sortBy,
-          order,
-        );
-        setProducts(data.products);
-        setTotalPages(data.pagination.totalPages);
-      } catch (error) {
-        console.error("Failed to load products:", error);
-        setError("Failed to load products.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [page, searchQuery, categoryId, supplierId, sortBy, order]);
+    void dispatch(fetchProducts());
+  }, [dispatch, page, searchQuery, categoryId, supplierId, sortBy, order]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -143,10 +112,8 @@ const Products = () => {
     }
 
     try {
-      await deleteProduct(id);
-      setProducts((currentProducts) =>
-        currentProducts.filter((product) => product.id !== id),
-      );
+      setDeleteError("");
+      await dispatch(removeProduct(id)).unwrap();
     } catch (error) {
       console.error("Failed to delete product:", error);
       setDeleteError("Failed to delete product.");
@@ -155,7 +122,7 @@ const Products = () => {
 
   const handleExport = async () => {
     try {
-      const blob = await exportProducts();
+      const blob = await dispatch(exportProductFile()).unwrap();
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -172,7 +139,7 @@ const Products = () => {
 
   const handleTemplateDownload = async () => {
     try {
-      const blob = await downloadProductTemplate();
+      const blob = await dispatch(downloadProductTemplateFile()).unwrap();
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -195,9 +162,8 @@ const Products = () => {
     }
 
     try {
-      await importProducts(file);
-
-      setRefresh((current) => current + 1);
+      await dispatch(importProductFile(file)).unwrap();
+      await dispatch(fetchProducts());
     } catch (error) {
       console.error("Failed to import products:", error);
     } finally {
@@ -231,8 +197,7 @@ const Products = () => {
               onChange={(event) => setSearch(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
-                  setPage(1);
-                  setSearchQuery(search);
+                  dispatch(setSearchQuery(search));
                 }
               }}
             />
@@ -242,8 +207,7 @@ const Products = () => {
             <select
               value={categoryId}
               onChange={(event) => {
-                setCategoryId(event.target.value);
-                setPage(1);
+                dispatch(setCategoryId(event.target.value));
               }}
             >
               <option value="">All Categories</option>
@@ -257,8 +221,7 @@ const Products = () => {
             <select
               value={supplierId}
               onChange={(event) => {
-                setSupplierId(event.target.value);
-                setPage(1);
+                dispatch(setSupplierId(event.target.value));
               }}
             >
               <option value="">All Suppliers</option>
@@ -272,8 +235,7 @@ const Products = () => {
             <select
               value={sortBy}
               onChange={(event) => {
-                setSortBy(event.target.value);
-                setPage(1);
+                dispatch(setSortBy(event.target.value));
               }}
             >
               <option value="createdAt">Date Added</option>
@@ -285,8 +247,7 @@ const Products = () => {
             <select
               value={order}
               onChange={(event) => {
-                setOrder(event.target.value);
-                setPage(1);
+                dispatch(setOrder(event.target.value));
               }}
             >
               <option value="desc">Descending</option>
@@ -347,56 +308,60 @@ const Products = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product.id}>
-                  <td>{product.name}</td>
-                  <td>{product.sku}</td>
-                  <td>{product.category.name}</td>
-                  <td>{product.supplier.name}</td>
-                  <td>{product.price}</td>
-                  <td>{product.quantity}</td>
-                  <td>{product.minStock}</td>
-                  <td>
-                    {(() => {
-                      const status = getStockStatus(
-                        product.quantity,
-                        product.minStock,
-                      );
-
-                      return (
+              {products.length === 0 ? (
+                <tr>
+                  <td colSpan={canEdit || canDelete ? 9 : 8}>
+                    No products found.
+                  </td>
+                </tr>
+              ) : (
+                products.map((product) => {
+                  const status = getStockStatus(
+                    product.quantity,
+                    product.minStock,
+                  );
+                  return (
+                    <tr key={product.id}>
+                      <td>{product.name}</td>
+                      <td>{product.sku}</td>
+                      <td>{product.category.name}</td>
+                      <td>{product.supplier.name}</td>
+                      <td>{product.price}</td>
+                      <td>{product.quantity}</td>
+                      <td>{product.minStock}</td>
+                      <td>
                         <span className={`stock-status ${status.className}`}>
                           {status.label}
                         </span>
-                      );
-                    })()}
-                  </td>
-                  {user?.role === "ADMIN" && "MANAGER" && <>
-                  <td>
-                    {canEdit && (
-                      <button type="button">
-                        <Edit
-                          size={18}
-                          color="blue"
-                          onClick={() =>
-                            navigate(`/products/${product.id}/edit`)
-                          }
-                        />
-                      </button>
-                    )}
-                    {canDelete && (
-                      <button type="button">
-                        <Trash
-                          size={18}
-                          color="red"
-                          onClick={() => handleDelete(product.id)}
-                        />
-                      </button>
-                    )}
-                  </td>
-                  </>}
-                  
-                </tr>
-              ))}
+                      </td>
+
+                      {(canEdit || canDelete) && (
+                        <td>
+                          {canEdit && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate(`/products/${product.id}/edit`)
+                              }
+                            >
+                              <Edit size={18} color="blue" />
+                            </button>
+                          )}
+
+                          {canDelete && (
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(product.id)}
+                            >
+                              <Trash size={18} color="red" />
+                            </button>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -406,7 +371,7 @@ const Products = () => {
             type="button"
             className="btn btn--primary"
             disabled={page === 1}
-            onClick={() => setPage((currentPage) => currentPage - 1)}
+            onClick={() => dispatch(setPage(page - 1))}
           >
             Previous
           </button>
@@ -419,7 +384,7 @@ const Products = () => {
             type="button"
             className="btn btn--primary"
             disabled={page === totalPages}
-            onClick={() => setPage((currentPage) => currentPage + 1)}
+            onClick={() => dispatch(setPage(page + 1))}
           >
             Next
           </button>

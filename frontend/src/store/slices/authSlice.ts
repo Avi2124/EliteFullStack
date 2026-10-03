@@ -1,10 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {
-  getProfile,
-  loginUser,
-  logoutUser,
-  type User,
-} from "../../services/authService";
+import { getProfile, loginUser, logoutUser, type User } from "../../services/authService";
 
 interface AuthState {
   user: User | null;
@@ -39,7 +34,6 @@ export const loadUser = createAsyncThunk(
 );
 
 // Login
-
 export const login = createAsyncThunk(
   "auth/login",
   async (
@@ -84,19 +78,18 @@ const authSlice = createSlice({
   },
 
   extraReducers: (builder) => {
+
     // Load User
     builder
       .addCase(loadUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-
       .addCase(loadUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
         state.error = null;
       })
-
       .addCase(loadUser.rejected, (state) => {
         state.loading = false;
         state.user = null;
@@ -108,14 +101,12 @@ const authSlice = createSlice({
         state.loginLoading = true;
         state.error = null;
       })
-
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.loginLoading = false;
         state.user = action.payload;
         state.error = null;
       })
-
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.loginLoading = false;
@@ -128,13 +119,11 @@ const authSlice = createSlice({
       .addCase(logout.pending, (state) => {
         state.loading = true;
       })
-
       .addCase(logout.fulfilled, (state) => {
         state.loading = false;
         state.user = null;
         state.error = null;
       })
-
       .addCase(logout.rejected, (state) => {
         state.loading = false;
         state.user = null;

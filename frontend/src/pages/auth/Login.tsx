@@ -18,14 +18,12 @@ function Login() {
         event.preventDefault();
         setError("");
         try {
-    const result = await dispatch(
+    await dispatch(
         login({
             email,
             password,
         })
     ).unwrap();
-
-    console.log("LOGIN SUCCESS:", result);
 
     navigate("/dashboard");
 } catch (error) {
