@@ -1,6 +1,6 @@
 import { BarChart3, Boxes, ClipboardList, FileText, LayoutDashboard, Mail, Package, Truck, Users, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAppSelector } from "../../store/hooks";
 
 interface SidebarProps {
     isOpen: boolean;
@@ -34,7 +34,7 @@ const menuItems = [
 ];
 
 function Sidebar ({isOpen, onClose}: SidebarProps) {
-    const { user } = useAuth();
+    const user = useAppSelector((state) => state.auth.user);
     const items = menuItems.filter((item) => {
         if(item.path === "/users") {
             return user?.role === "ADMIN" || user?.role === "MANAGER";

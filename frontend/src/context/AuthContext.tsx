@@ -2,11 +2,14 @@ import {
     createContext,
     useContext,
     useEffect,
-    useState,
     type ReactNode,
 } from "react";
 
-import { getProfile, logoutUser, type User } from "../services/authService";
+// import { getProfile, logoutUser, type User } from "../services/authService";
+import { type User } from "../services/authService";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+
+import {loadUser, logout as logoutUserAction} from "../store/slices/authSlice";
 
 interface AuthContextType { 
     user: User | null;
@@ -22,52 +25,70 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.auth.user);
+    const loading = useAppSelector((state) => state.auth.loading);
+    console.log("AUTH:", {
+    user,
+    loading,
+});
 
-    const loadUser = async () => {
-        const token = localStorage.getItem("accessToken");
-
-        if (!token) {
-            setUser(null);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const profile = await getProfile();
-            setUser(profile);
-        } catch (error) {
-            console.error("Failed to load user:", error);
-            setUser(null);
-        } finally {
-            setLoading(false);
-        }
+    const handleLoadUser = async () => {
+        await dispatch(loadUser());
     };
+
+    const handleLogout = async () => {
+        await dispatch(logoutUserAction());
+    }
 
     useEffect(() => {
-        void Promise.resolve().then(loadUser);
+        void handleLoadUser();
     }, []);
 
-    const logout = async () => {
-        try {
-            await logoutUser();
-        } catch (error) {
-            console.error("Logout failed:", error);
-        } finally {
-            localStorage.removeItem("accessToken");
-            setUser(null);
-        }
-    };
+    // const loadUser = async () => {
+    //     const token = localStorage.getItem("accessToken");
+
+    //     if (!token) {
+    //         setUser(null);
+    //         setLoading(false);
+    //         return;
+    //     }
+
+    //     try {
+    //         setLoading(true);
+    //         const profile = await getProfile();
+    //         setUser(profile);
+    //     } catch (error) {
+    //         console.error("Failed to load user:", error);
+    //         setUser(null);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     void Promise.resolve().then(loadUser);
+    // }, []);
+
+    // const logout = async () => {
+    //     try {
+    //         await logoutUser();
+    //     } catch (error) {
+    //         console.error("Logout failed:", error);
+    //     } finally {
+    //         localStorage.removeItem("accessToken");
+    //         setUser(null);
+    //     }
+    // };
 
     return (
         <AuthContext.Provider
             value={{
                 user,
                 loading,
-                loadUser,
-                logout,
+                loadUser: handleLoadUser,
+                logout: handleLogout,
             }}
         >
             {children}

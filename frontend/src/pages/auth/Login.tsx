@@ -1,33 +1,35 @@
 import { AlertTriangle, Eye, EyeOff, LockKeyhole, Mail, Package } from "lucide-react";
 import { useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../services/authService";
-import { useAuth } from "../../context/AuthContext";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { login } from "../../store/slices/authSlice";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { loadUser } = useAuth();
+    const dispatch = useAppDispatch();
+    const authLoading = useAppSelector((state) => state.auth.loginLoading);
+    const isFormValid = email.trim() !== "" && password.trim() !== "";
 
     const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError("");
-        setLoading(true);
         try {
-            const res = await loginUser({email, password});
-            localStorage.setItem("accessToken", res);
-            await loadUser();
-            navigate("/dashboard");
-        } catch {
-            setError("Invalid Email or Password");
-        } finally {
-            setLoading(false);
-        }
-        // console.log({email, password});
+    await dispatch(
+        login({
+            email,
+            password,
+        })
+    ).unwrap();
+
+    navigate("/dashboard");
+} catch (error) {
+    console.log("LOGIN ERROR:", error);
+    setError("Invalid Email or Password");
+}
     };
 
     return (
@@ -108,7 +110,7 @@ function Login() {
                                 </div>
                             )}
                             </div>
-                            <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? "Signing In..." : "Sign In"}</button>
+                            <button type="submit" className="btn btn--primary" disabled={!isFormValid || authLoading}>{authLoading ? "Signing In..." : "Sign In"}</button>
                         </form>
                     </div>
                 </section>

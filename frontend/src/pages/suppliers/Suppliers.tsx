@@ -1,78 +1,39 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    deleteSupplier,
-    getSuppliers,
-    type Supplier,
-} from "../../services/supplierService";
 import { Edit, Trash } from "lucide-react";
 import Loading from "../../components/common/Loading";
-import { useAuth } from "../../context/AuthContext";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchSuppliers, removeSupplier } from "../../store/slices/supplierSlice";
 
 const Suppliers = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector((state) => state.auth.user);
+    const {suppliers, loading, error, mutationLoading} = useAppSelector((state) => state.supplier);
+    const [deleteError, setDeleteError] = useState("");    
 
-    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [deleteError, setDeleteError] = useState("");
-
-    const canCreate =
-        user?.role === "ADMIN" || user?.role === "MANAGER";
-
-    const canEdit =
-        user?.role === "ADMIN" || user?.role === "MANAGER";
-
+    const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
+    const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
     const canDelete = user?.role === "ADMIN";
 
     const handleDelete = async (id: string) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this supplier?"
-        );
-
+        const confirmed = window.confirm("Are you sure you want to delete this supplier?");
         if (!confirmed) {
             return;
         }
-
         try {
             setDeleteError("");
-
-            await deleteSupplier(id);
-
-            setSuppliers((currentSuppliers) =>
-                currentSuppliers.filter(
-                    (supplier) => supplier.id !== id
-                )
-            );
+            await dispatch(removeSupplier(id)).unwrap();
         } catch (error) {
             console.error("Failed to delete supplier:", error);
-            setDeleteError(
-                "Failed to delete supplier. It may be used by existing products."
-            );
+            setDeleteError("Failed to delete supplier. It may be used by existing products.");
         }
     };
 
     useEffect(() => {
-        const fetchSuppliers = async () => {
-            try {
-                setLoading(true);
-                setError("");
-
-                const data = await getSuppliers();
-
-                setSuppliers(data);
-            } catch (error) {
-                console.error("Failed to load suppliers:", error);
-                setError("Failed to load suppliers.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchSuppliers();
-    }, []);
+        void dispatch(fetchSuppliers());
+    }, [dispatch]);
 
     if (loading) {
         return (
@@ -120,7 +81,7 @@ const Suppliers = () => {
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                {user?.role === "ADMIN" && "MANAGER" && <th>Actions</th>}
+                                {(canEdit || canDelete) && <th>Actions</th>}
                             </tr>
                         </thead>
 
@@ -130,7 +91,7 @@ const Suppliers = () => {
                                     <td>{supplier.name}</td>
                                     <td>{supplier.email}</td>
                                     <td>{supplier.phone}</td>
-                                    {user?.role === "ADMIN" && "MANAGER" && <>
+                                    {(canEdit || canDelete) && <>
                                         <td>
                                         {canEdit && (
                                             <button
@@ -148,6 +109,7 @@ const Suppliers = () => {
                                         {canDelete && (
                                             <button
                                                 type="button"
+                                                disabled={mutationLoading}
                                                 onClick={() =>
                                                     handleDelete(
                                                         supplier.id
