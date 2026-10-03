@@ -1,74 +1,22 @@
 import { useEffect, useState } from "react";
-
-import { getProducts, type Product } from "../../services/productService";
-import { getCategories, type Category } from "../../services/categoryService";
-import { getSuppliers, type Supplier } from "../../services/supplierService";
-
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchInventory, fetchInventoryFilters, setCategoryId, setSearchQuery, setStatus, setSupplierId } from "../../store/slices/inventorySlice";
 
 function Inventory() {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-
+    const dispatch = useAppDispatch();
+    const {products, categories, suppliers, searchQuery, categoryId, supplierId, status, loading, error} = useAppSelector((state) => state.inventory);
     const [search, setSearch] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
 
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [categoryId, setCategoryId] = useState("");
-
-    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-    const [supplierId, setSupplierId] = useState("");
-
-    const [status, setStatus] = useState("");
 
     useEffect(() => {
-        const fetchFilters = async () => {
-            try {
-                const [categoryData, supplierData] = await Promise.all([
-                    getCategories(),
-                    getSuppliers(),
-                ]);
-
-                setCategories(categoryData);
-                setSuppliers(supplierData);
-            } catch (error) {
-                console.error("Failed to load inventory filters:", error);
-                setError("Failed to load inventory filters.");
-            }
-        };
-
-        fetchFilters();
-    }, []);
+        void dispatch(fetchInventoryFilters());
+    }, [dispatch]);
 
     useEffect(() => {
-        const fetchInventory = async () => {
-            try {
-                setLoading(true);
-                setError("");
-
-                const data = await getProducts(
-                    1,
-                    100,
-                    searchQuery,
-                    categoryId,
-                    supplierId,
-                    "name",
-                    "asc"
-                );
-
-                setProducts(data.products);
-            } catch (error) {
-                console.error("Failed to load inventory:", error);
-                setError("Failed to load inventory.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInventory();
-    }, [searchQuery, categoryId, supplierId]);
+        void dispatch(fetchInventory());
+    }, [dispatch, searchQuery, categoryId, supplierId]);
 
     const getStockStatus = (quantity: number, minStock: number) => {
         if (quantity === 0) {
@@ -142,14 +90,14 @@ function Inventory() {
                         onChange={(event) => setSearch(event.target.value)}
                         onKeyDown={(event) => {
                             if (event.key === "Enter") {
-                                setSearchQuery(search);
+                                dispatch(setSearchQuery(search));
                             }
                         }}
                     />
 
                     <select
                         value={categoryId}
-                        onChange={(event) => setCategoryId(event.target.value)}
+                        onChange={(event) => dispatch(setCategoryId(event.target.value))}
                     >
                         <option value="">All Categories</option>
 
@@ -162,7 +110,7 @@ function Inventory() {
 
                     <select
                         value={supplierId}
-                        onChange={(event) => setSupplierId(event.target.value)}
+                        onChange={(event) => dispatch(setSupplierId(event.target.value))}
                     >
                         <option value="">All Suppliers</option>
 
@@ -175,7 +123,7 @@ function Inventory() {
 
                     <select
                         value={status}
-                        onChange={(event) => setStatus(event.target.value)}
+                        onChange={(event) => dispatch(setStatus(event.target.value))}
                     >
                         <option value="">All Status</option>
                         <option value="In Stock">In Stock</option>
