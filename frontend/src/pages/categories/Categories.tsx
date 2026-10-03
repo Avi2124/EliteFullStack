@@ -1,41 +1,41 @@
 import { useEffect, useState } from "react"
-import { deleteCategory, getCategories, type Category } from "../../services/categoryService";
 import { Edit, PlusCircle, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
-import { useAuth } from "../../context/AuthContext";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchCategories, removeCategory } from "../../store/slices/categorySlice";
 
 
 const Categories = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const user = useAppSelector((state) => state.auth.user);
+    const {categories, loading, error} = useAppSelector((state) => state.category);  
     const [deleteError, setDeleteError] = useState("");
-    const { user } = useAuth();
 
     const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
     const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
     const canDelete = user?.role === "ADMIN";
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                setLoading(true);
-                setError("");
-                const data = await getCategories();
-                setCategories(data);
-            } catch (error) {
-                console.error("Failed to load categories:", error);
-                setError("Failed to load categories");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchCategories();
-    }, []);
+        void dispatch(fetchCategories());
+    }, [dispatch]);
+
+    const handleDelete = async (id: string) => {
+        const confirmed = window.confirm("Are you sure you want to delete this category?");
+        if(!confirmed) {
+            return;
+        }
+        try {
+            setDeleteError("");
+            await dispatch(removeCategory(id)).unwrap();
+        } catch (error) {
+            console.error("Failed to delete category:", error);
+            setDeleteError("Failed to delete category. It may be used by existing products.");
+        }
+    };
 
     if(loading) {
         return (
@@ -51,22 +51,7 @@ const Categories = () => {
             <ErrorMessage message={error} />
         </div>
     );
-    }
-
-    const handleDelete = async (id: string) => {
-        const confirmed = window.confirm("Are you sure you want to delete this category?");
-        if(!confirmed) {
-            return;
-        }
-
-        try {
-            await deleteCategory(id);
-            setCategories((currentCategories) => currentCategories.filter((category) => category.id !== id));
-        } catch (error) {
-            console.error("Failed to delete category:", error);
-            setDeleteError("Failed to delete category. It may be used by existing products.");
-        }
-    };
+    }   
 
   return (
     <div className="categories-page">
