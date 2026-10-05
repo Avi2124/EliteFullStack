@@ -1,14 +1,20 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
-import { type Category, getCategories } from "../../services/categoryService";
-import { getSuppliers, type Supplier } from "../../services/supplierService";
-import { createProduct } from "../../services/productService";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {fetchCategories} from "../../store/slices/categorySlice";
+import {fetchSuppliers} from "../../store/slices/supplierSlice";
+import {addProduct} from "../../store/slices/productSlice";
 
 const CreateProduct = () => {
 
     const navigate = useNavigate();
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+    const dispatch = useAppDispatch();
+
+    const categories = useAppSelector((state) => state.category.categories);
+    const suppliers = useAppSelector((state) => state.supplier.suppliers);
+    const mutationLoading = useAppSelector((state) => state.product.mutationLoading);
+    const reduxError = useAppSelector((state) => state.product.error);
+
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [sku, setSku] = useState("");
@@ -17,47 +23,41 @@ const CreateProduct = () => {
     const [minStock, setMinStock] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [supplierId, setSupplierId] = useState("");
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [categoriesData, suppliersData] = await Promise.all([
-                    getCategories(),
-                    getSuppliers()
-                ]);
-                setCategories(categoriesData);
-                setSuppliers(suppliersData);
-            } catch (error) {
-                console.error("Failed to load categories or suppliers:", error);
-            }
-        };
-        fetchData();
-    }, []);
+    void dispatch(fetchCategories());
+    void dispatch(fetchSuppliers());
+}, [dispatch]);
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setError("");
-        if(!name || !sku || !price || !categoryId || !supplierId) {
-            setError("Please fill all required fields.");
-            return;
-        }
-        try {
-            setLoading(true);
-            const product = await createProduct({
-                name, description, sku, price: Number(price), quantity: Number(quantity), minStock: Number(minStock), categoryId, supplierId
-            });
-            console.log("Product created:", product);
-            navigate("/products");
-        } catch (error) {
-            console.error("Failed to create product:", error);
-            setError("Failed to create product.");
-        } finally {
-            setLoading(false);
-        }
-        console.log({name, description, sku, price, quantity, minStock, categoryId, supplierId});
-    };
+    const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+) => {
+    event.preventDefault();
+    setError("");
+    if (!name || !sku || !price || !categoryId || !supplierId) {
+        setError("Please fill all required fields.");
+        return;
+    }
+    try {
+        await dispatch(
+            addProduct({
+                name,
+                description,
+                sku,
+                price: Number(price),
+                quantity: Number(quantity),
+                minStock: Number(minStock),
+                categoryId,
+                supplierId,
+            })
+        ).unwrap();
+        navigate("/products");
+    } catch (error) {
+        console.error("Failed to create product:", error);
+        setError((error as string) || reduxError || "Failed to create product.");
+    }
+};
 
   return (
     <div className="products-page">
@@ -66,7 +66,6 @@ const CreateProduct = () => {
                 <h1>Create Product</h1>
                 <p>Add a new product to your inventory.</p>
             </div>
-            {/* <button type="button" className="btn btn--secondary" onClick={() => navigate("/products")}>Back to Products</button> */}
         </div>      
 
         <div className="products-card">
@@ -125,12 +124,11 @@ const CreateProduct = () => {
                         ))}
                     </select>
                 </div>
+            <div className="product-form__actions">
+                <button type="button" className="btn btn--danger" disabled={mutationLoading} onClick={() => navigate("/products")}>Cancle</button>
+                <button type="submit" className="btn btn--primary" disabled={mutationLoading}>{mutationLoading ? "Creating..." : "Create Product"}</button>
+            </div>
             </form>
-<div className="btns">
-
-                <button type="submit" className="btn btn--danger" disabled={loading} onClick={() => navigate("/products")}>{loading ? "Canceling..." : "Cancel"}</button>
-                <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? "Creating..." : "Create Product"}</button>
-</div>
         </div>
     </div>
   );

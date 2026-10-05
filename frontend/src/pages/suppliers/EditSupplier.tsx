@@ -1,50 +1,39 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    getSupplierById,
-    updateSupplier,
-} from "../../services/supplierService";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { clearSelectedSupplier, editSupplier, fetchSupplierById } from "../../store/slices/supplierSlice";
 
 const EditSupplier = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const {loading, mutationLoading, error} = useAppSelector((state) => state.supplier);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
 
     useEffect(() => {
-        const fetchSupplier = async () => {
-            if (!id) {
-                setError("Supplier ID is missing.");
-                setLoading(false);
-                return;
-            }
-
+        if (!id) {
+            return;
+        }
+        const loadSupplier = async () => {
             try {
-                const supplier = await getSupplierById(id);
-
-                setName(supplier.name);
-                setEmail(supplier.email);
-                setPhone(supplier.phone);
+                const result = await dispatch(fetchSupplierById(id)).unwrap();
+                setName(result.name);
+                setEmail(result.email);
+                setPhone(result.phone);
             } catch (error) {
-                console.error(
-                    "Failed to load supplier:",
-                    error
-                );
-                setError("Failed to load supplier.");
-            } finally {
-                setLoading(false);
+                console.error("Failed to load supplier:", error);
             }
         };
-
-        fetchSupplier();
-    }, [id]);
+        void loadSupplier();
+        return () => {
+            dispatch(clearSelectedSupplier());
+        };            
+    }, [dispatch, id]);
 
     const handleSubmit = async (
         event: FormEvent<HTMLFormElement>
@@ -54,36 +43,24 @@ const EditSupplier = () => {
         if (!id) {
             return;
         }
-
-        setError("");
-
         if (
             !name.trim() ||
             !email.trim() ||
             !phone.trim()
         ) {
-            setError("Please fill all fields.");
             return;
         }
 
         try {
-            setSaving(true);
-
-            await updateSupplier(id, {
+            await dispatch(editSupplier({id, supplier: {
                 name: name.trim(),
                 email: email.trim(),
                 phone: phone.trim(),
-            });
-
-            navigate("/suppliers");
+            }
+        })).unwrap();
+        navigate("/suppliers");
         } catch (error) {
-            console.error(
-                "Failed to update supplier:",
-                error
-            );
-            setError("Failed to update supplier.");
-        } finally {
-            setSaving(false);
+            console.error("Failed to update supplier:",error);
         }
     };
 
@@ -170,14 +147,14 @@ const EditSupplier = () => {
 
                     <div className="product-form__actions">
                         <button
-                            type="button" className="btn btn--danger"
+                            type="button" className="btn btn--danger" disabled={mutationLoading}
                             onClick={() => navigate("/suppliers")}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" className="btn btn--primary" disabled={saving}>
-                            {saving
+                        <button type="submit" className="btn btn--primary" disabled={mutationLoading}>
+                            {mutationLoading
                                 ? "Updating..."
                                 : "Update Supplier"}
                         </button>

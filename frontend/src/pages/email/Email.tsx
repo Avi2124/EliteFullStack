@@ -1,46 +1,10 @@
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { sendDailyEmail, sendLowStockEmail, sendWeeklyEmail } from "../../store/slices/emailSlice";
 
-import {
-    sendDailyInventorySummary,
-    sendLowStockAlert,
-    sendWeeklyInventoryReport,
-} from "../../services/emailService";
 
 const Email = () => {
-    const [loading, setLoading] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
-
-    const handleSendEmail = async (
-        type: "daily" | "low-stock" | "weekly"
-    ) => {
-        try {
-            setLoading(type);
-            setMessage("");
-            setError("");
-
-            if (type === "daily") {
-                await sendDailyInventorySummary();
-                setMessage("Daily inventory summary sent successfully.");
-            }
-
-            if (type === "low-stock") {
-                await sendLowStockAlert();
-                setMessage("Low stock alert sent successfully.");
-            }
-
-            if (type === "weekly") {
-                await sendWeeklyInventoryReport();
-                setMessage("Weekly inventory report sent successfully.");
-            }
-        } catch (error) {
-            console.error("Failed to send email:", error);
-            setError("Failed to send email. Please try again.");
-        } finally {
-            setLoading("");
-        }
-    };
-
+    const dispatch = useAppDispatch();
+    const {loading, message, error} = useAppSelector((state) => state.email);
     return (
         <div className="email-page">
             <div className="email-page__header">
@@ -75,7 +39,7 @@ const Email = () => {
 
                     <button
                         type="button" className="btn btn--primary"
-                        onClick={() => handleSendEmail("daily")}
+                        onClick={() => {void dispatch(sendDailyEmail());}}
                         disabled={loading !== ""}
                     >
                         {loading === "daily"
@@ -95,7 +59,7 @@ const Email = () => {
 
                     <button
                         type="button" className="btn btn--primary"
-                        onClick={() => handleSendEmail("low-stock")}
+                        onClick={() => {void dispatch(sendLowStockEmail());}}
                         disabled={loading !== ""}
                     >
                         {loading === "low-stock"
@@ -115,7 +79,7 @@ const Email = () => {
 
                     <button
                         type="button" className="btn btn--primary"
-                        onClick={() => handleSendEmail("weekly")}
+                        onClick={() =>{void dispatch(sendWeeklyEmail());}}
                         disabled={loading !== ""}
                     >
                         {loading === "weekly"

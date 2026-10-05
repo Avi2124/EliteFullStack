@@ -1,34 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit, Trash } from "lucide-react";
-
-import {
-  getUsers,
-  deleteUser,
-  type User,
-  type UserRole,
-  updateUserStatus,
-} from "../../services/userService";
 import Loading from "../../components/common/Loading";
-import { useAuth } from "../../context/AuthContext";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { changeUserStatus, fetchUsers, removeUser, setRole, setSearchQuery, setStatus, setUserPage } from "../../store/slices/userSlice";
+import type { UserRole } from "../../services/userService";
 
 const Users = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const {users, page, totalPages, loading, error, role, status} = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.auth.user);
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [role, setRole] = useState<UserRole | "">("");
-  const [status, setStatus] = useState<"ACTIVE" | "INACTIVE" | "">("");
   const [deleteError, setDeleteError] = useState("");
-
-  const { user } = useAuth();
 
   const canManageUsers = user?.role === "ADMIN" || user?.role === "MANAGER";
   const canCreate = canManageUsers;
@@ -36,18 +23,13 @@ const Users = () => {
   const canDelete = user?.role === "ADMIN";
 
   const handleDelete = async (id: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this user?",
-    );
-
+    const confirmed = window.confirm("Are you sure you want to delete this user?");
     if (!confirmed) {
       return;
     }
-
     try {
-      await deleteUser(id);
-
-      setUsers((currentUsers) => currentUsers.filter((user) => user.id !== id));
+      setDeleteError("");
+      await dispatch(removeUser(id)).unwrap();
     } catch (error) {
       console.error("Failed to delete user:", error);
       setDeleteError("Failed to delete user.");
@@ -63,44 +45,18 @@ const Users = () => {
   }, [search]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        setError("");
+    dispatch(setSearchQuery(debouncedSearch));
+  }, [debouncedSearch, dispatch]);
 
-        const data = await getUsers(
-          page,
-          limit,
-          debouncedSearch,
-          role,
-          status === "ACTIVE" ? "true" : status === "INACTIVE" ? "false" : "",
-        );
-
-        setUsers(data.users);
-        setTotalPages(data.pagination.totalPages);
-      } catch (error) {
-        console.error("Failed to load users:", error);
-
-        setError("Failed to load users.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, [page, limit, debouncedSearch, role, status]);
+  useEffect(() => {
+    void dispatch(fetchUsers());
+  }, [dispatch, page, debouncedSearch, role, status]);
 
   const handleStatusChange = async (id: string, currentStatus: boolean) => {
     try {
-      await updateUserStatus(id, !currentStatus);
-      setUsers((currentUsers) =>
-        currentUsers.map((user) =>
-          user.id === id ? { ...user, isActive: !currentStatus } : user,
-        ),
-      );
+      await dispatch(changeUserStatus({id, isActive: !currentStatus})).unwrap();
     } catch (error) {
       console.error("Failed to update user status:", error);
-      setError("Failed to update user status.");
     }
   };
 
@@ -136,37 +92,29 @@ const Users = () => {
           value={search}
           onChange={(event) => {
             setSearch(event.target.value);
-            setPage(1);
           }}
-        />
+        /> 
 
         <select
           value={role}
           onChange={(event) => {
-            setRole(event.target.value as UserRole | "");
-            setPage(1);
+             dispatch(setRole(event.target.value as UserRole | ""));
           }}
         >
           <option value="">All Roles</option>
-
           <option value="ADMIN">Admin</option>
-
           <option value="MANAGER">Manager</option>
-
           <option value="STAFF">Staff</option>
         </select>
 
         <select
           value={status}
           onChange={(event) => {
-            setStatus(event.target.value as "ACTIVE" | "INACTIVE" | "");
-            setPage(1);
+            dispatch(setStatus(event.target.value as "ACTIVE" | "INACTIVE" | ""));
           }}
         >
           <option value="">All Status</option>
-
           <option value="ACTIVE">Active</option>
-
           <option value="INACTIVE">Inactive</option>
         </select>
       </div>
@@ -272,7 +220,7 @@ const Users = () => {
         <button
           type="button" className="btn btn--primary"
           disabled={page === 1}
-          onClick={() => setPage((currentPage) => currentPage - 1)}
+          onClick={() => dispatch(setUserPage(page - 1))}
         >
           Previous
         </button>
@@ -284,7 +232,7 @@ const Users = () => {
         <button
           type="button" className="btn btn--primary"
           disabled={page === totalPages}
-          onClick={() => setPage((currentPage) => currentPage + 1)}
+          onClick={() => dispatch(setUserPage(page + 1))}
         >
           Next
         </button>

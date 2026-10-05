@@ -1,14 +1,16 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { createSupplier } from "../../services/supplierService";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { addSupplier } from "../../store/slices/supplierSlice";
 
 const CreateSupplier = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const mutationLoading = useAppSelector((state) => state.supplier.mutationLoading);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleSubmit = async (
@@ -27,20 +29,17 @@ const CreateSupplier = () => {
         }
 
         try {
-            setLoading(true);
-
-            await createSupplier({
-                name: name.trim(),
-                email: email.trim(),
-                phone: phone.trim(),
-            });
-
+            await dispatch(
+                addSupplier({
+                    name: name.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                })
+            ).unwrap();
             navigate("/suppliers");
         } catch (error) {
             console.error("Failed to create supplier:", error);
             setError("Failed to create supplier.");
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -114,14 +113,14 @@ const CreateSupplier = () => {
 
                     <div className="product-form__actions">
                         <button
-                            type="button" className="btn btn--danger"
+                            type="button" className="btn btn--danger" disabled={mutationLoading} 
                             onClick={() => navigate("/suppliers")}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" className="btn btn--primary" disabled={loading}>
-                            {loading
+                        <button type="submit" className="btn btn--primary" disabled={mutationLoading}>
+                            {mutationLoading
                                 ? "Creating..."
                                 : "Create Supplier"}
                         </button>

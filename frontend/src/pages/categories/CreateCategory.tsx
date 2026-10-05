@@ -1,12 +1,16 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { createCategory } from "../../services/categoryService";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { addCategory } from "../../store/slices/categorySlice";
 
 const CreateCategory = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
+    const mutationLoading = useAppSelector((state) => state.category.mutationLoading);
+    const reduxError = useAppSelector((state) => state.category.error);
 
     const [name, setName] = useState("");
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -19,18 +23,14 @@ const CreateCategory = () => {
         }
 
         try {
-            setLoading(true);
-
-            await createCategory({
+            await dispatch (addCategory({
                 name: name.trim(),
-            });
+            })).unwrap();
 
             navigate("/categories");
         } catch (error) {
             console.error("Failed to create category:", error);
-            setError("Failed to create category.");
-        } finally {
-            setLoading(false);
+            setError(reduxError || "Failed to create category.");
         }
     };
 
@@ -67,14 +67,14 @@ const CreateCategory = () => {
 
                     <div className="product-form__actions">
                         <button
-                            type="button" className="btn btn--danger"
+                            type="button" className="btn btn--danger" disabled={mutationLoading}
                             onClick={() => navigate("/categories")}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" className="btn btn--primary" disabled={loading}>
-                            {loading ? "Creating..." : "Create Category"}
+                        <button type="submit" className="btn btn--primary" disabled={mutationLoading}>
+                            {mutationLoading ? "Creating..." : "Create Category"}
                         </button>
                     </div>
                 </form>

@@ -1,18 +1,17 @@
 import { Navigate, Outlet } from "react-router-dom";
-
 import Loading from "../components/common/Loading";
-import { useAuth } from "../context/AuthContext";
-import type { User } from "../services/authService";
+import { useAppSelector } from "../store/hooks";
+
 
 interface ProtectedRouteProps {
-    allowedRoles?: User["role"][];
+    allowedRoles?: ("ADMIN" | "MANAGER" | "STAFF")[];
 }
 
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     const token = localStorage.getItem("accessToken");
 
-    const { user, loading } = useAuth();
-
+    const user = useAppSelector((state) => state.auth.user);
+    const loading = useAppSelector((state) => state.auth.loading);
     if (!token) {
         return <Navigate to="/login" replace />;
     }

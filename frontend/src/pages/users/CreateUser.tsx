@@ -1,51 +1,42 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-
-import {
-    createUser,
-    type UserRole,
-} from "../../services/userService";
-
+import { useNavigate } from "react-router-dom";
+import { type UserRole } from "../../services/userService";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { addUser } from "../../store/slices/userSlice";
 
 const CreateUser = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const mutationLoading = useAppSelector((state) => state.user.mutationLoading);
+    const reduxError = useAppSelector((state) => state.user.error);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState<UserRole>("STAFF");
-
-    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         if (!name || !email || !password) {
             setError("Please fill all required fields.");
             return;
         }
-
         try {
-            setLoading(true);
-            setError("");
-
-            await createUser({
-                name,
-                email,
-                password,
-                role,
-            });
-
+            await dispatch(
+                addUser({
+                    name: name.trim(),
+                    email: email.trim(),
+                    password,
+                    role,
+                })).unwrap();
             navigate("/users");
         } catch (error) {
             console.error("Failed to create user:", error);
-            setError("Failed to create user.");
-        } finally {
-            setLoading(false);
+            setError(reduxError || "Failed to create user.");
         }
     };
 
@@ -142,6 +133,7 @@ const CreateUser = () => {
                             className="btn btn--danger"
                             type="button"
                             onClick={() => navigate("/users")}
+                            disabled={mutationLoading}
                         >
                             Cancel
                         </button>
@@ -149,9 +141,9 @@ const CreateUser = () => {
                         <button
                             type="submit"
                             className="btn btn--primary"
-                            disabled={loading}
+                            disabled={mutationLoading}
                         >
-                            {loading ? "Creating..." : "Create User"}
+                            {mutationLoading ? "Creating..." : "Create User"}
                         </button>
                     </div>
                 </form>
