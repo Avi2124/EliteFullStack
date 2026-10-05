@@ -1,37 +1,16 @@
-import { useEffect, useState } from "react"
-import { type AuditLog, getAuditLogs } from "../../services/auditLogService";
+import { useEffect } from "react"
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchAuditLogs, setAuditLogAction, setAuditLogEntity, setAuditLogPage } from "../../store/slices/auditLogSlice";
 
 const AuditLogs = () => {
-
-    const [logs, setLogs] = useState<AuditLog[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [page, setPage] = useState(1);
-    const [limit] = useState(10);
-    const [totalPages, setTotalPages] = useState(1);
-    const [action, setAction] = useState("");
-    const [entity, setEntity] = useState("");
-    const [userId] = useState("");
+    const dispatch = useAppDispatch();
+    const {logs, page, totalPages, action, entity, loading, error} = useAppSelector((state) => state.auditLog);
 
     useEffect(() => {
-        const fetchAuditLogs = async () => {
-            try {
-                setLoading(true);
-                setError("");
-                const data = await getAuditLogs(page, limit, action, entity, userId);
-                setLogs(data.logs);
-                setTotalPages(data.pagination.totalPages);
-            } catch (error) {
-                console.error("Failed to load audit logs:", error);
-                setError("Failed to load audit logs.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAuditLogs();
-    }, [page, limit, action, entity, userId]);
+        void dispatch(fetchAuditLogs());
+    }, [dispatch, page, action, entity]);
 
     const formatDate = (date:string) => {
         return new Date(date).toLocaleString();
@@ -42,13 +21,11 @@ const AuditLogs = () => {
     };
 
     const handleActionChange = (value:string) => {
-        setAction(value);
-        setPage(1);
+        dispatch(setAuditLogAction(value));
     };
 
     const handleEntityChange = (value:string) => {
-        setEntity(value);
-        setPage(1);
+        dispatch(setAuditLogEntity(value));
     };
 
     if(error) {
@@ -130,9 +107,9 @@ const AuditLogs = () => {
             </div>
 
             <div className="audit-logs-pagination">
-                    <button type="button" className="btn btn--primary" disabled={page === 1} onClick={() => setPage((currentPage) => currentPage - 1)}>Previous</button>
+                    <button type="button" className="btn btn--primary" disabled={page === 1} onClick={() => dispatch(setAuditLogPage(page - 1))}>Previous</button>
                     <span>Page {page} of {" "} {totalPages}</span>
-                    <button type="button" className="btn btn--primary" disabled={page === totalPages} onClick={() => setPage((currentPage) => currentPage + 1)}>Next</button>
+                    <button type="button" className="btn btn--primary" disabled={page === totalPages} onClick={() => dispatch(setAuditLogPage(page + 1))}>Next</button>
             </div>
         </div>
     </div>

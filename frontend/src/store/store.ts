@@ -7,6 +7,7 @@ import supplierReducer from "./slices/supplierSlice";
 import inventoryReducer from "./slices/inventorySlice";
 import transactionReducer from "./slices/transactionSlice";
 import userReducer from "./slices/userSlice";
+import auditLogReducer from "./slices/auditLogSlice";
 
 export const store = configureStore({
     reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
         inventory: inventoryReducer,
         transaction: transactionReducer,
         user: userReducer,
+        auditLog: auditLogReducer,
     }
 });
 
