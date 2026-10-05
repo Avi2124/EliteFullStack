@@ -147,7 +147,7 @@ const EditSupplier = () => {
 
                     <div className="product-form__actions">
                         <button
-                            type="button" className="btn btn--danger"
+                            type="button" className="btn btn--danger" disabled={mutationLoading}
                             onClick={() => navigate("/suppliers")}
                         >
                             Cancel

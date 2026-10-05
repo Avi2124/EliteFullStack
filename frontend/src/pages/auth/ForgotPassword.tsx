@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../../services/authService";
 
@@ -9,7 +9,7 @@ const ForgotPassword = () => {
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (
-        event: FormEvent<HTMLFormElement>
+        event: React.FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
 

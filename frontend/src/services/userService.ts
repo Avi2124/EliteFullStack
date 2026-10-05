@@ -11,7 +11,7 @@ export interface User {
     updatedAt: string;
 }
 
-interface UserResponse {
+interface UserListResponse {
     success: boolean;
     message: string;
     data: {
@@ -23,6 +23,12 @@ interface UserResponse {
             totalPages: number;
         };
     };
+}
+
+interface UserSingleResponse {
+    success: boolean;
+    message: string;
+    data: User;
 }
 
 interface CreateUserData {
@@ -39,32 +45,32 @@ interface UpdateUserData {
 }
 
 export const getUsers = async (page = 1, limit = 10, search = "", role = "", isActive = "") => {
-    const res = await api.get<UserResponse>("/api/users/get-all", {params: {page, limit, ...(search ? {search} : {}),
+    const res = await api.get<UserListResponse>("/api/users/get-all", {params: {page, limit, ...(search ? {search} : {}),
             ...(role ? {role} : {}), ...(isActive ? {isActive} : {})}});
     return res.data.data;
 };
 
 export const getUserById = async (id:string) => {
-    const res = await api.get<UserResponse>(`/api/users/${id}`);
+    const res = await api.get<UserSingleResponse>(`/api/users/${id}`);
     return res.data.data;
 };
 
 export const createUser = async (data: CreateUserData) => {
-    const res = await api.post<UserResponse>("/api/users/create", data);
+    const res = await api.post<UserSingleResponse>("/api/users/create", data);
     return res.data.data;
 };
 
 export const updateUser = async (id: string, data: UpdateUserData) => {
-    const res = await api.put<UserResponse>(`/api/users/${id}`, data);
+    const res = await api.put<UserSingleResponse>(`/api/users/${id}`, data);
     return res.data.data; 
 }
 
 export const updateUserStatus = async (id: string, isActive: boolean) => {
-    const res = await api.patch<UserResponse>(`/api/users/${id}/status`, {isActive});
+    const res = await api.patch<UserListResponse>(`/api/users/${id}/status`, {isActive});
     return res.data;
 };
 
 export const deleteUser = async (id: string) => {
-    const res = await api.delete<UserResponse>(`/api/users/${id}`);
+    const res = await api.delete<UserListResponse>(`/api/users/${id}`);
     return res.data;
 };

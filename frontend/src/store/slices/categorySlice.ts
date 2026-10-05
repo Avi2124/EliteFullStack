@@ -157,7 +157,7 @@ const categorySlice = createSlice({
         })
         .addCase(removeCategory.fulfilled, (state, action) => {
             state.mutationLoading = false;
-            state.categories.filter((category) => category.id !== action.payload);
+            state.categories = state.categories.filter((category) => category.id !== action.payload);
             state.error = null;
         })
         .addCase(removeCategory.rejected, (state, action) => {

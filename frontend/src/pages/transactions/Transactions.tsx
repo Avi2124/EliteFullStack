@@ -1,60 +1,31 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { getProducts, type Product } from "../../services/productService";
-
+import { useEffect, useState } from "react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-
 import { PlusCircle } from "lucide-react";
-
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
-import {
-  fetchTransactions,
-  setTransactionPage,
-  addTransaction,
-} from "../../store/slices/transactionSlice";
-
+import {fetchTransactions,setTransactionPage,addTransaction} from "../../store/slices/transactionSlice";
 import type { InventoryTransactionType } from "../../services/inventoryTransactionService";
+import { fetchProducts } from "../../store/slices/productSlice";
 
 function Transactions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Form/UI state stays local
-  const [products, setProducts] = useState<Product[]>([]);
-  const [transactionType, setTransactionType] =
-    useState<InventoryTransactionType>("STOCK_IN");
+  const [transactionType, setTransactionType] = useState<InventoryTransactionType>("STOCK_IN");
   const [transactionProductId, setTransactionProductId] = useState("");
   const [transactionQuantity, setTransactionQuantity] = useState("");
   const [transactionRemarks, setTransactionRemarks] = useState("");
   const [transactionError, setTransactionError] = useState("");
 
   const dispatch = useAppDispatch();
-
-  // Redux state
-  const { transactions, page, totalPages, loading, error, mutationLoading } =
-    useAppSelector((state) => state.transaction);
-
+  const products = useAppSelector((state) => state.product.products);
+  const { transactions, page, totalPages, loading, error, mutationLoading } = useAppSelector((state) => state.transaction);
   const user = useAppSelector((state) => state.auth.user);
 
   const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
 
-  // Fetch transaction history
   useEffect(() => {
     void dispatch(fetchTransactions());
   }, [dispatch, page]);
-
-  // Load products for create transaction modal
-  const fetchProducts = async () => {
-    try {
-      const data = await getProducts(1, 100, "", "", "", "name", "asc");
-
-      setProducts(data.products);
-    } catch (error) {
-      console.error("Failed to load products:", error);
-
-      setTransactionError("Failed to load products.");
-    }
-  };
 
   const handleOpenModal = () => {
     setTransactionType("STOCK_IN");
@@ -62,27 +33,22 @@ function Transactions() {
     setTransactionQuantity("");
     setTransactionRemarks("");
     setTransactionError("");
-
     setIsModalOpen(true);
-
-    void fetchProducts();
+    void dispatch(fetchProducts());
   };
 
   const handleCloseModal = () => {
     if (mutationLoading) {
       return;
     }
-
     setIsModalOpen(false);
     setTransactionError("");
   };
 
-  const handleTransaction = async (event: FormEvent<HTMLFormElement>) => {
+  const handleTransaction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setTransactionError("");
-
-    if (!transactionProductId) {
+if (!transactionProductId) {
       setTransactionError("Please select a product.");
       return;
     }

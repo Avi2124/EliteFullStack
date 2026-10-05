@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { type Category, getCategories } from "../../services/categoryService";
-import { getSuppliers, type Supplier } from "../../services/supplierService";
 import { Download, Edit, FileSpreadsheet, PlusCircle, Search, Trash, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
@@ -8,26 +6,19 @@ import ErrorMessage from "../../components/common/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { downloadProductTemplateFile, exportProductFile, fetchProducts, importProductFile, removeProduct, setCategoryId,
     setOrder, setPage, setSearchQuery, setSortBy, setSupplierId } from "../../store/slices/productSlice";
+import { fetchCategories } from "../../store/slices/categorySlice";
+import { fetchSuppliers } from "../../store/slices/supplierSlice";
 
 const Products = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
-  const {
-    products,
-    page,
-    totalPages,
-    searchQuery,
-    categoryId,
-    supplierId,
-    sortBy,
-    order,
-    loading,
-    error
-  } = useAppSelector((state) => state.product);
+
+  const categories = useAppSelector((state) => state.category.categories);
+  const suppliers = useAppSelector((state) => state.supplier.suppliers);
+
+  const {products, page, totalPages, searchQuery, categoryId, supplierId, sortBy, order, loading, error} = useAppSelector((state) => state.product);
   const [search, setSearch] = useState(searchQuery);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [deleteError, setDeleteError] = useState("");
 
   const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
@@ -39,28 +30,9 @@ const Products = () => {
   }, [dispatch, page, searchQuery, categoryId, supplierId, sortBy, order]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error("Failed to load categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const fetchSuppliers = async () => {
-      try {
-        const data = await getSuppliers();
-        setSuppliers(data);
-      } catch (error) {
-        console.error("Failed to load suppliers:", error);
-      }
-    };
-    fetchSuppliers();
-  }, []);
+    void dispatch(fetchCategories());
+    void dispatch(fetchSuppliers());
+}, [dispatch]);
 
   if (loading) {
     return (

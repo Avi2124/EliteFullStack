@@ -12,9 +12,6 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
     const user = useAppSelector((state) => state.auth.user);
     const loading = useAppSelector((state) => state.auth.loading);
-
-    // const { user, loading } = useAuth();
-
     if (!token) {
         return <Navigate to="/login" replace />;
     }

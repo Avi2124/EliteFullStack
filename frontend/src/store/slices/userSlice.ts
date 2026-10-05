@@ -170,8 +170,7 @@ const userSlice = createSlice({
 
         .addCase(fetchUserById.fulfilled, (state, action) => {
             state.loading = false;
-            const response = action.payload;
-            state.selectedUser = "users" in response ? response.users[0] || null : response;
+            state.selectedUser = action.payload;
             state.error = null;
         })
         .addCase(fetchUserById.rejected, (state, action) => {

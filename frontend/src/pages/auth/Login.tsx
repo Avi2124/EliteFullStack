@@ -1,5 +1,5 @@
 import { AlertTriangle, Eye, EyeOff, LockKeyhole, Mail, Package } from "lucide-react";
-import { useState, type FormEvent } from "react"
+import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { login } from "../../store/slices/authSlice";
@@ -14,7 +14,7 @@ function Login() {
     const authLoading = useAppSelector((state) => state.auth.loginLoading);
     const isFormValid = email.trim() !== "" && password.trim() !== "";
 
-    const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError("");
         try {

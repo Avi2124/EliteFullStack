@@ -1,16 +1,20 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
-import { getCategories, type Category } from "../../services/categoryService";
-import { getSuppliers, type Supplier } from "../../services/supplierService";
-import { getProductById, updateProduct } from "../../services/productService";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {fetchCategories} from "../../store/slices/categorySlice";
+import {fetchSuppliers} from "../../store/slices/supplierSlice";
+import {fetchProductById, editProduct} from "../../store/slices/productSlice";
 
 const EditProduct = () => {
     const {id} = useParams();
     const navigate = useNavigate();
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+    const dispatch = useAppDispatch();
+    const {selectedProduct, loading, mutationLoading, error} = useAppSelector((state) => state.product);
+    const categories = useAppSelector((state) => state.category.categories);
+    const suppliers = useAppSelector((state) => state.supplier.suppliers);
+
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [sku, setSku] = useState("");
@@ -19,72 +23,73 @@ const EditProduct = () => {
     const [minStock, setMinStock] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [supplierId, setSupplierId] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [saving, setSaving] = useState(false);
     const [submitError, setSubmitError] = useState("");
+    const [initializedProductId, setInitializedProductId] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if(!id) {
-                setError("Product ID not found.");
-                setLoading(false);
-                return;
-            }
-            try {
-                const [product, categoriesData, suppliersData] = await Promise.all([
-                    getProductById(id),
-                    getCategories(),
-                    getSuppliers()
-                ]);
-                setName(product.name);
-                setDescription(product.description);
-                setSku(product.sku);
-                setPrice(product.price);
-                setQuantity(String(product.quantity));
-                setMinStock(String(product.minStock));
-                setCategoryId(String(product.categoryId));
-                setSupplierId(String(product.supplierId));
-                setCategories(categoriesData);
-                setSuppliers(suppliersData);
-            } catch (error) {
-                console.error("Failed to load product:", error);
-                setError("Failed to load product.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [id]);
+    if (!id) {
+        return;
+    }
+        void dispatch(fetchProductById(id));
+        void dispatch(fetchCategories());
+        void dispatch(fetchSuppliers());
+    }, [dispatch, id]);
 
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setSubmitError("");
-        if(!name || !sku || !categoryId || !price || !supplierId ) {
-            setSubmitError("Please fill all required fields.");
-            return;
-        }
-        try {
-            setSaving(true);
-            await updateProduct(id!, {
-                name, description, sku, price: Number(price), quantity: Number(quantity), minStock: Number(minStock), categoryId, supplierId
-            });
-            navigate("/products");
-        } catch (error) {
-            console.error("Failed to update product:", error);
-            setSubmitError("Failed to update product.");            
-        } finally {
-            setSaving(false);
-        }
-    };
+    if (selectedProduct && initializedProductId !== selectedProduct.id) {
+        setName(selectedProduct.name);
+        setDescription(selectedProduct.description);
+        setSku(selectedProduct.sku);
+        setPrice(String(selectedProduct.price));
+        setQuantity(String(selectedProduct.quantity));
+        setMinStock(String(selectedProduct.minStock));
+        setCategoryId(String(selectedProduct.categoryId));
+        setSupplierId(String(selectedProduct.supplierId));
+        setInitializedProductId(selectedProduct.id);
+    }
 
-    if(loading) {
+const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+) => {
+    event.preventDefault();
+    setSubmitError("");
+    if (!id) {
+        setSubmitError("Product ID not found.");
+        return;
+    }
+    if (!name || !sku || !categoryId || !price || !supplierId) {
+        setSubmitError("Please fill all required fields.");
+        return;
+    }
+    try {
+        await dispatch(
+            editProduct({
+                id,
+                product: {
+                    name,
+                    description,
+                    sku,
+                    price: Number(price),
+                    quantity: Number(quantity),
+                    minStock: Number(minStock),
+                    categoryId,
+                    supplierId,
+                },
+            })
+        ).unwrap();
+        navigate("/products");
+    } catch (error) {
+        console.error("Failed to update product:", error);
+        setSubmitError((error as string) || "Failed to update product.");
+    }
+};
+
+    if(loading && !selectedProduct) {
         return (
             <div className="products-page"><Loading /></div>
         );
     }
 
-    if(error) {
+    if(error && !selectedProduct) {
         return (
             <div className="products-page"><ErrorMessage message={error} /></div>
         );
@@ -152,8 +157,8 @@ const EditProduct = () => {
                 </div>
 
                 <div className="product-form__actions">
-                    <button type="button" className="btn btn--danger" onClick={() => navigate("/products")}>Cancel</button>
-                    <button type="submit" className="btn btn--primary" disabled={saving}>{saving ? "Updating..." : "Update Product"}</button>
+                    <button type="button" className="btn btn--danger" disabled={mutationLoading} onClick={() => navigate("/products")}>Cancel</button>
+                    <button type="submit" className="btn btn--primary" disabled={mutationLoading}>{mutationLoading ? "Updating..." : "Update Product"}</button>
                 </div>
 
             </form>
