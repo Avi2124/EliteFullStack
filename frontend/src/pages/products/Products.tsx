@@ -276,7 +276,7 @@ const Products = () => {
                 <th>Quantity</th>
                 <th>Min Stock</th>
                 <th>Status</th>
-                {user?.role === "ADMIN" && "MANAGER" && <th>Actions</th>}
+                {(canEdit || canDelete) && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
