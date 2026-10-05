@@ -77,7 +77,7 @@ export const editUser = createAsyncThunk("user/editUser",
     async(data: {
         id: string;
         user: {
-            mane?: string;
+            name?: string;
             email?: string;
             role?: UserRole;
         };

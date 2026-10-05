@@ -1,92 +1,68 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    getUserById,
-    updateUser,
-    type UserRole,
-} from "../../services/userService";
+import {type UserRole} from "../../services/userService";
 import Loading from "../../components/common/Loading";
-import ErrorMessage from "../../components/common/ErrorMessage";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { clearSelectedUser, editUser, fetchUserById } from "../../store/slices/userSlice";
 
 const EditUser = () => {
-    const { id } = useParams();
+    const { id } = useParams<{id: string}>();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const selectedUser = useAppSelector((state) => state.user.selectedUser);
+    const loading = useAppSelector((state) => state.user.loading);
+    const mutationLoading  = useAppSelector((state) => state.user.mutationLoading );
+    const reduxError  = useAppSelector((state) => state.user.error );
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState<UserRole>("STAFF");
-
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+    const [formUserId, setFormUserId] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchUser = async () => {
             if (!id) {
-                setError("User ID is missing.");
-                setLoading(false);
                 return;
             }
+            void dispatch(fetchUserById(id));
+            return () => {
+                dispatch(clearSelectedUser());
+            };
+    },[id, dispatch]);
 
-            try {
-                setLoading(true);
-                setError("");
+    if (selectedUser && formUserId !== selectedUser.id) {
+        setFormUserId(selectedUser.id);
+        setName(selectedUser.name);
+        setEmail(selectedUser.email);
+        setRole(selectedUser.role);
+    }
 
-                const response = await getUserById(id);
-                const user = "users" in response ? response.users[0] : response;
-
-                if (!user) {
-                    setError("User not found.");
-                    return;
-                }
-
-                setName(user.name);
-                setEmail(user.email);
-                setRole(user.role);
-            } catch (error) {
-                console.error("Failed to load user:", error);
-                setError("Failed to load user.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, [id]);
-
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         if (!id) {
-            setError("User ID is missing.");
             return;
         }
-
-        if (!name || !email) {
-            setError("Please fill all required fields.");
+        if (!name.trim() || !email.trim()) {
+            setError("Name and Email are required.");
             return;
         }
-
         try {
-            setSaving(true);
-            setError("");
-
-            await updateUser(id, {
-                name,
-                email,
-                role,
-            });
-
+            await dispatch(
+                editUser({id, user: {
+                    name: name.trim(),
+                    email: email.trim(),
+                    role,
+                },
+                })
+            ).unwrap();
             navigate("/users");
         } catch (error) {
             console.error("Failed to update user:", error);
-            setError("Failed to update user.");
-        } finally {
-            setSaving(false);
+            setError(reduxError || "Failed to update user.");
         }
     };
 
-    if (loading) {
+    if (loading && !selectedUser) {
         return <div><Loading /></div>;
     }
 
@@ -142,18 +118,19 @@ const EditUser = () => {
                         </select>
                     </div>
 
-                    {error && <ErrorMessage message={error} />}
+                    {(error || reduxError) && <p className="form-error">{error || reduxError}</p>}
 
                     <div className="product-form__actions">
                         <button className="btn btn--danger"
                             type="button"
                             onClick={() => navigate("/users")}
+                            disabled={mutationLoading}
                         >
                             Cancel
                         </button>
 
-                        <button type="submit" className="btn btn--primary" disabled={saving}>
-                            {saving ? "Updating..." : "Update User"}
+                        <button type="submit" className="btn btn--primary" disabled={mutationLoading}>
+                            {mutationLoading ? "Updating..." : "Update User"}
                         </button>
                     </div>
 
