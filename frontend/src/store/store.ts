@@ -8,6 +8,7 @@ import inventoryReducer from "./slices/inventorySlice";
 import transactionReducer from "./slices/transactionSlice";
 import userReducer from "./slices/userSlice";
 import auditLogReducer from "./slices/auditLogSlice";
+import emailReducer from "./slices/emailSlice";
 
 export const store = configureStore({
     reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
         transaction: transactionReducer,
         user: userReducer,
         auditLog: auditLogReducer,
+        email: emailReducer,
     }
 });
 
